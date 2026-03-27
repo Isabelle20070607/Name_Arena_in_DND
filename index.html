@@ -1,0 +1,3066 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="phb" data-mode="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>名字竞技场 · Name Arena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<!-- Flash prevention: apply theme before first paint -->
+<script>
+(function(){
+  var t = localStorage.getItem('arena_theme') || 'phb';
+  var m = localStorage.getItem('arena_mode') || 'light';
+  var html = document.documentElement;
+  html.setAttribute('data-theme', t);
+  if (m === 'system') m = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  html.setAttribute('data-mode', m);
+  html.style.opacity = '0';
+})();
+</script>
+
+<style>
+/* ===================================================================
+   RESET
+   =================================================================== */
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+button { cursor: pointer; }
+input, button { font-family: inherit; }
+a { text-decoration: none; }
+
+/* ===================================================================
+   THEME VARIABLES — PHB Classic
+   bg: parchment | heading: dark maroon | accent: crimson | gold
+   =================================================================== */
+:root,
+[data-theme="phb"][data-mode="light"] {
+  --bg:            #F4ECE1;
+  --bg-surface:    #FAF6F0;
+  --bg-stat:       #FDF1DC;
+  --bg-header:     #58180D;
+  --bg-overlay:    rgba(244,236,225,0.92);
+  --text:          #1D1D1B;
+  --text-sec:      #6B5B4E;
+  --text-faint:    #a89880;
+  --heading:       #58180D;
+  --accent:        #9B1B30;
+  --gold:          #C8A951;
+  --border:        #C9AD6A;
+  --border-stat:   #E69A28;
+  --border-faint:  rgba(201,173,106,0.35);
+  --red:           #8B0000;
+  --green:         #3E7A3C;
+  --blue:          #2B5A83;
+  --purple:        #5C3D7A;
+  --orange:        #C86400;
+  --shadow:        rgba(89,64,40,0.14);
+  --shadow-lg:     rgba(89,64,40,0.22);
+  --btn-bg:        #58180D;
+  --btn-text:      #F4ECE1;
+  --btn-hover:     #7a2010;
+  --hp-track:      rgba(0,0,0,0.09);
+  --input-bg:      var(--bg-surface);
+  --divider:       linear-gradient(to right, transparent, #C9AD6A 20%, #C9AD6A 80%, transparent);
+  --parchment-tex: repeating-linear-gradient(
+    45deg, transparent, transparent 2px,
+    rgba(201,173,106,0.04) 2px, rgba(201,173,106,0.04) 4px
+  );
+}
+[data-theme="phb"][data-mode="dark"] {
+  --bg:            #1a130c;
+  --bg-surface:    #241a12;
+  --bg-stat:       #2c1f14;
+  --bg-header:     #0f0a06;
+  --bg-overlay:    rgba(26,19,12,0.94);
+  --text:          #e8dcc8;
+  --text-sec:      #a89880;
+  --text-faint:    #6a5840;
+  --heading:       #d4956a;
+  --accent:        #d45050;
+  --gold:          #c8a040;
+  --border:        #4a3a28;
+  --border-stat:   #8a5820;
+  --border-faint:  rgba(74,58,40,0.5);
+  --red:           #e05050;
+  --green:         #50b850;
+  --blue:          #5090d0;
+  --purple:        #9060d0;
+  --orange:        #e08030;
+  --shadow:        rgba(0,0,0,0.45);
+  --shadow-lg:     rgba(0,0,0,0.6);
+  --btn-bg:        #8b3a1a;
+  --btn-text:      #f0e0c8;
+  --btn-hover:     #a84820;
+  --hp-track:      rgba(255,255,255,0.08);
+  --input-bg:      #1e1610;
+  --divider:       linear-gradient(to right, transparent, #5a3a20 20%, #8a5820 50%, #5a3a20 80%, transparent);
+  --parchment-tex: none;
+}
+
+/* ===================================================================
+   THEME VARIABLES — Arcane Scholar
+   bg: cool grey-white | heading: navy | accent: blue | scholarly
+   =================================================================== */
+[data-theme="arcane"][data-mode="light"] {
+  --bg:            #F0EDE8;
+  --bg-surface:    #FAF8F4;
+  --bg-stat:       #EEE8DC;
+  --bg-header:     #1a3a5c;
+  --bg-overlay:    rgba(240,237,232,0.93);
+  --text:          #2C3E50;
+  --text-sec:      #6C7A89;
+  --text-faint:    #a0aab4;
+  --heading:       #1a3a5c;
+  --accent:        #2980b9;
+  --gold:          #b8860b;
+  --border:        #CBD0D8;
+  --border-stat:   #2980b9;
+  --border-faint:  rgba(41,128,185,0.2);
+  --red:           #c0392b;
+  --green:         #27ae60;
+  --blue:          #2980b9;
+  --purple:        #6c3483;
+  --orange:        #d35400;
+  --shadow:        rgba(44,62,80,0.1);
+  --shadow-lg:     rgba(44,62,80,0.18);
+  --btn-bg:        #1a3a5c;
+  --btn-text:      #f0ede8;
+  --btn-hover:     #254d78;
+  --hp-track:      rgba(0,0,0,0.07);
+  --input-bg:      var(--bg-surface);
+  --divider:       linear-gradient(to right, transparent, #CBD0D8 20%, #CBD0D8 80%, transparent);
+  --parchment-tex: none;
+}
+[data-theme="arcane"][data-mode="dark"] {
+  --bg:            #0e1a28;
+  --bg-surface:    #152238;
+  --bg-stat:       #1a2a42;
+  --bg-header:     #081018;
+  --bg-overlay:    rgba(14,26,40,0.94);
+  --text:          #d0d8e0;
+  --text-sec:      #7a8a9a;
+  --text-faint:    #485868;
+  --heading:       #5dade2;
+  --accent:        #3498db;
+  --gold:          #f0c030;
+  --border:        #2c3e50;
+  --border-stat:   #2980b9;
+  --border-faint:  rgba(41,128,185,0.25);
+  --red:           #e74c3c;
+  --green:         #2ecc71;
+  --blue:          #3498db;
+  --purple:        #9b59b6;
+  --orange:        #e67e22;
+  --shadow:        rgba(0,0,0,0.5);
+  --shadow-lg:     rgba(0,0,0,0.65);
+  --btn-bg:        #2980b9;
+  --btn-text:      #f0f0f0;
+  --btn-hover:     #3498db;
+  --hp-track:      rgba(255,255,255,0.08);
+  --input-bg:      #0a1520;
+  --divider:       linear-gradient(to right, transparent, #2c3e50 20%, #2980b9 50%, #2c3e50 80%, transparent);
+  --parchment-tex: none;
+}
+
+/* ===================================================================
+   THEME VARIABLES — Dragon & Flame
+   bg: warm ivory | heading: deep red | accent: flame gold
+   =================================================================== */
+[data-theme="dragon"][data-mode="light"] {
+  --bg:            #F5EFE6;
+  --bg-surface:    #FDFAF5;
+  --bg-stat:       #F8EED8;
+  --bg-header:     #6b1010;
+  --bg-overlay:    rgba(245,239,230,0.93);
+  --text:          #2A1A0E;
+  --text-sec:      #7A5C40;
+  --text-faint:    #b09070;
+  --heading:       #6b1010;
+  --accent:        #b8860b;
+  --gold:          #DAA520;
+  --border:        #C4A265;
+  --border-stat:   #b8860b;
+  --border-faint:  rgba(180,134,11,0.25);
+  --red:           #9b1b1b;
+  --green:         #4A7A2E;
+  --blue:          #2B6080;
+  --purple:        #6B3A6B;
+  --orange:        #c85000;
+  --shadow:        rgba(107,16,16,0.1);
+  --shadow-lg:     rgba(107,16,16,0.18);
+  --btn-bg:        #6b1010;
+  --btn-text:      #F5EFE6;
+  --btn-hover:     #8a1818;
+  --hp-track:      rgba(0,0,0,0.08);
+  --input-bg:      var(--bg-surface);
+  --divider:       linear-gradient(to right, transparent, #6b1010 15%, #DAA520 50%, #6b1010 85%, transparent);
+  --parchment-tex: repeating-linear-gradient(
+    -45deg, transparent, transparent 3px,
+    rgba(180,134,11,0.04) 3px, rgba(180,134,11,0.04) 6px
+  );
+}
+[data-theme="dragon"][data-mode="dark"] {
+  --bg:            #140a06;
+  --bg-surface:    #1e1008;
+  --bg-stat:       #281a0c;
+  --bg-header:     #0a0402;
+  --bg-overlay:    rgba(20,10,6,0.94);
+  --text:          #e8d8c0;
+  --text-sec:      #a08060;
+  --text-faint:    #605040;
+  --heading:       #e07030;
+  --accent:        #DAA520;
+  --gold:          #f0c030;
+  --border:        #4a3020;
+  --border-stat:   #b87010;
+  --border-faint:  rgba(74,48,32,0.5);
+  --red:           #e05030;
+  --green:         #60c040;
+  --blue:          #4090c0;
+  --purple:        #c060c0;
+  --orange:        #e08030;
+  --shadow:        rgba(0,0,0,0.55);
+  --shadow-lg:     rgba(0,0,0,0.7);
+  --btn-bg:        #8b2010;
+  --btn-text:      #f0dcc0;
+  --btn-hover:     #aa2818;
+  --hp-track:      rgba(255,255,255,0.08);
+  --input-bg:      #100806;
+  --divider:       linear-gradient(to right, transparent, #6b2010 15%, #b87010 50%, #6b2010 85%, transparent);
+  --parchment-tex: none;
+}
+
+/* ===================================================================
+   GLOBAL TOKENS
+   =================================================================== */
+:root {
+  --font-display: 'Cinzel Decorative', serif;
+  --font-heading: 'Cinzel', serif;
+  --font-body:    'Crimson Text', 'Noto Serif SC', serif;
+  --font-cn:      'Noto Serif SC', serif;
+  --font-mono:    'JetBrains Mono', monospace;
+  --radius:       4px;
+  --radius-lg:    8px;
+  --radius-xl:    12px;
+  --transition:   0.25s ease;
+}
+
+/* ===================================================================
+   BASE
+   =================================================================== */
+html {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  background-image: var(--parchment-tex);
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+}
+
+/* ===================================================================
+   LAYOUT SHELL
+   =================================================================== */
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ===== TOPBAR ===== */
+#topbar {
+  background: var(--bg-header);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+#topbar-title {
+  font-family: var(--font-heading);
+  color: var(--btn-text);
+  font-size: 1.05em;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  opacity: 0.95;
+}
+.topbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.topbar-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--btn-text);
+  padding: 5px 12px;
+  border-radius: var(--radius);
+  font-family: var(--font-heading);
+  font-size: 0.72em;
+  letter-spacing: 0.06em;
+  transition: background var(--transition);
+}
+.topbar-btn:hover { background: rgba(255,255,255,0.18); }
+.topbar-btn.active { background: rgba(255,255,255,0.25); }
+
+/* ===== MAIN CONTENT ===== */
+#main {
+  flex: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 28px 20px 48px;
+}
+
+/* ===================================================================
+   VIEWS (only one visible at a time)
+   =================================================================== */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ===================================================================
+   LANDING VIEW
+   =================================================================== */
+#view-landing {
+  text-align: center;
+  padding: 40px 0 20px;
+}
+.landing-crest {
+  font-size: 3em;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+.landing-title {
+  font-family: var(--font-display);
+  color: var(--heading);
+  font-size: clamp(1.6em, 5vw, 2.8em);
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.landing-subtitle {
+  font-family: var(--font-body);
+  color: var(--text-sec);
+  font-size: 1.1em;
+  font-style: italic;
+  margin-bottom: 36px;
+}
+.landing-subtitle-cn {
+  font-family: var(--font-cn);
+  font-style: normal;
+  font-size: 0.95em;
+  color: var(--text-faint);
+}
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  max-width: 700px;
+  margin: 0 auto 40px;
+}
+.mode-card {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px 16px;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  text-align: center;
+}
+.mode-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px var(--shadow);
+  border-color: var(--gold);
+}
+.mode-card.disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.mode-card.disabled:hover { transform: none; box-shadow: none; border-color: var(--border); }
+.mode-card-icon { font-size: 2.2em; margin-bottom: 10px; }
+.mode-card-name {
+  font-family: var(--font-heading);
+  color: var(--heading);
+  font-size: 0.95em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.mode-card-cn {
+  font-family: var(--font-cn);
+  color: var(--text-sec);
+  font-size: 0.85em;
+}
+.mode-card-badge {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: var(--font-heading);
+  font-size: 0.65em;
+  color: var(--text-faint);
+  border: 1px solid var(--border-faint);
+  padding: 1px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.08em;
+}
+
+.ornament-divider {
+  border: none;
+  height: 2px;
+  background: var(--divider);
+  margin: 32px auto;
+  max-width: 400px;
+}
+
+/* ===================================================================
+   DUEL VIEW
+   =================================================================== */
+.view-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.back-btn {
+  background: none;
+  border: 1.5px solid var(--border);
+  color: var(--text-sec);
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  font-family: var(--font-heading);
+  font-size: 0.78em;
+  letter-spacing: 0.05em;
+  transition: all var(--transition);
+}
+.back-btn:hover { border-color: var(--heading); color: var(--heading); }
+.view-title {
+  font-family: var(--font-heading);
+  color: var(--heading);
+  font-size: 1.3em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+/* Name input area */
+.duel-input-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.name-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.name-label {
+  font-family: var(--font-heading);
+  font-size: 0.72em;
+  color: var(--text-faint);
+  letter-spacing: 0.1em;
+}
+.name-input {
+  width: 180px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input-bg);
+  color: var(--text);
+  font-family: var(--font-cn);
+  font-size: 1.05em;
+  text-align: center;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.name-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--border-faint);
+}
+.vs-orb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-stat);
+  border: 2px solid var(--border-stat);
+  font-family: var(--font-heading);
+  font-weight: 900;
+  color: var(--heading);
+  font-size: 0.85em;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+.duel-actions {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+/* ===== STAT BLOCK GRID ===== */
+.char-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+@media (max-width: 600px) { .char-grid { grid-template-columns: 1fr; } }
+
+/* ===================================================================
+   STAT BLOCK COMPONENT
+   =================================================================== */
+.stat-block {
+  background: var(--bg-stat);
+  border-top: 3px solid var(--border-stat);
+  border-bottom: 3px solid var(--border-stat);
+  padding: 14px 16px;
+  font-size: 0.9em;
+}
+.stat-block-name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--heading);
+  font-size: 1.15em;
+  margin-bottom: 1px;
+}
+.stat-block-class {
+  font-family: var(--font-body);
+  color: var(--text-sec);
+  font-style: italic;
+  font-size: 0.9em;
+  margin-bottom: 2px;
+}
+.stat-block-title {
+  font-family: var(--font-body);
+  color: var(--accent);
+  font-style: italic;
+  font-size: 0.82em;
+  margin-bottom: 8px;
+}
+.stat-divider {
+  border: none;
+  height: 1.5px;
+  background: var(--border-stat);
+  opacity: 0.5;
+  margin: 7px 0;
+}
+.stat-line {
+  font-family: var(--font-body);
+  color: var(--text);
+  font-size: 0.88em;
+  margin: 3px 0;
+  line-height: 1.4;
+}
+.stat-line b { font-weight: 700; color: var(--heading); }
+
+/* Ability scores row */
+.ability-scores {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 3px;
+  margin: 8px 0;
+  text-align: center;
+}
+.ability-box {
+  padding: 5px 2px;
+}
+.ability-box .ab-label {
+  font-family: var(--font-heading);
+  font-size: 0.62em;
+  font-weight: 700;
+  color: var(--heading);
+  letter-spacing: 0.06em;
+  display: block;
+}
+.ability-box .ab-val {
+  font-family: var(--font-mono);
+  font-size: 1.18em;
+  font-weight: 600;
+  color: var(--text);
+  display: block;
+  line-height: 1.2;
+}
+.ability-box .ab-mod {
+  font-family: var(--font-mono);
+  font-size: 0.72em;
+  color: var(--text-sec);
+  display: block;
+}
+
+/* Skills list in stat block */
+.skill-list {
+  list-style: none;
+  margin: 6px 0 0;
+}
+.skill-list li {
+  font-size: 0.85em;
+  padding: 2px 0;
+  display: flex;
+  gap: 5px;
+  align-items: baseline;
+  line-height: 1.4;
+}
+.skill-name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--heading);
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+.skill-desc {
+  font-family: var(--font-body);
+  color: var(--text-sec);
+  font-style: italic;
+  font-size: 0.95em;
+}
+
+/* ===================================================================
+   HP BARS
+   =================================================================== */
+.hp-bars-section {
+  margin: 4px 0 16px;
+}
+.hp-bar-row {
+  margin-bottom: 8px;
+}
+.hp-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  color: var(--text-sec);
+  margin-bottom: 3px;
+}
+.hp-bar-labels .hp-name { color: var(--text); font-weight: 600; }
+.hp-track {
+  height: 11px;
+  background: var(--hp-track);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border-faint);
+}
+.hp-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.7s cubic-bezier(0.4,0,0.2,1),
+              background-color 0.5s ease;
+}
+.hp-fill[data-pct="high"]   { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+.hp-fill[data-pct="medium"] { background: linear-gradient(90deg, #c8a017, #e8c040); }
+.hp-fill[data-pct="low"]    { background: linear-gradient(90deg, #c0391c, #e0502a); }
+.hp-fill[data-pct="critical"] {
+  background: linear-gradient(90deg, #8b0000, #c0291c);
+  animation: hp-pulse 1.2s ease-in-out infinite;
+}
+@keyframes hp-pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.65; }
+}
+
+/* ===================================================================
+   COMBAT SECTION
+   =================================================================== */
+.combat-section {
+  margin-top: 8px;
+}
+.combat-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.combat-round-label {
+  font-family: var(--font-heading);
+  font-size: 0.85em;
+  color: var(--heading);
+  letter-spacing: 0.06em;
+}
+.speed-controls {
+  display: flex;
+  gap: 4px;
+}
+.speed-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-sec);
+  padding: 4px 10px;
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  transition: all var(--transition);
+}
+.speed-btn:hover { border-color: var(--accent); color: var(--accent); }
+.speed-btn.active { background: var(--btn-bg); color: var(--btn-text); border-color: var(--btn-bg); }
+
+/* Combat log */
+.combat-log {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  height: 260px;
+  overflow-y: auto;
+  font-size: 0.85em;
+  line-height: 1.55;
+  scroll-behavior: smooth;
+}
+.combat-log::-webkit-scrollbar { width: 5px; }
+.combat-log::-webkit-scrollbar-track { background: transparent; }
+.combat-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.log-round-header {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.88em;
+  color: var(--heading);
+  letter-spacing: 0.06em;
+  margin: 10px 0 4px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-faint);
+}
+.log-round-header:first-child { margin-top: 0; border-top: none; padding-top: 0; }
+
+.log-entry {
+  padding: 1px 0;
+  font-family: var(--font-body);
+  color: var(--text);
+  opacity: 0;
+  transform: translateX(-6px);
+  animation: logSlideIn 0.22s ease forwards;
+}
+@keyframes logSlideIn {
+  to { opacity: 1; transform: translateX(0); }
+}
+.log-entry .dice  { font-family: var(--font-mono); color: var(--accent); font-weight: 600; }
+.log-entry .dmg   { font-family: var(--font-mono); color: var(--red);    font-weight: 700; }
+.log-entry .heal  { font-family: var(--font-mono); color: var(--green);  font-weight: 700; }
+.log-entry .miss  { color: var(--text-faint); font-style: italic; }
+.log-entry .crit  { color: var(--gold); font-weight: 700; }
+.log-entry .skill { color: var(--purple); font-weight: 600; }
+.log-entry .save  { color: var(--blue); }
+.log-entry .narr  { color: var(--text-sec); font-style: italic; }
+
+/* ===================================================================
+   RESULT BANNER
+   =================================================================== */
+.result-banner {
+  display: none;
+  text-align: center;
+  margin-top: 16px;
+  padding: 18px 20px;
+  background: var(--bg-stat);
+  border: 2px solid var(--gold);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 16px var(--shadow);
+  animation: bannerIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+}
+.result-banner.visible { display: block; }
+@keyframes bannerIn {
+  from { opacity: 0; transform: scale(0.9) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.result-winner {
+  font-family: var(--font-display);
+  color: var(--heading);
+  font-size: 1.3em;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+.result-detail {
+  font-family: var(--font-body);
+  color: var(--text-sec);
+  font-size: 0.9em;
+  margin-bottom: 12px;
+}
+.result-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* ===================================================================
+   CHARACTER SHEET VIEW
+   =================================================================== */
+.sheet-input-area {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+/* Full character sheet card */
+.char-sheet-card {
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--bg-stat);
+  border-top: 6px solid var(--border-stat);
+  border-bottom: 6px solid var(--border-stat);
+  padding: 24px 22px;
+  box-shadow: 0 8px 32px var(--shadow-lg);
+}
+.sheet-name {
+  font-family: var(--font-heading);
+  font-weight: 900;
+  color: var(--heading);
+  font-size: 1.6em;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+.sheet-name-cn {
+  font-family: var(--font-cn);
+  font-weight: 700;
+  color: var(--heading);
+  font-size: 1.2em;
+  margin-bottom: 2px;
+}
+.sheet-class-line {
+  font-family: var(--font-body);
+  color: var(--text-sec);
+  font-style: italic;
+  font-size: 0.95em;
+  margin-bottom: 3px;
+}
+.sheet-title-line {
+  font-family: var(--font-body);
+  color: var(--accent);
+  font-style: italic;
+  font-size: 0.9em;
+  margin-bottom: 12px;
+}
+.sheet-divider {
+  border: none;
+  height: 2px;
+  background: var(--border-stat);
+  margin: 10px 0;
+  opacity: 0.7;
+}
+.sheet-core-stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.sheet-core-stat {
+  font-family: var(--font-body);
+  font-size: 0.9em;
+  color: var(--text);
+}
+.sheet-core-stat b { color: var(--heading); font-weight: 700; }
+
+/* Ability score grid in sheet */
+.sheet-ability-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  margin: 12px 0;
+  text-align: center;
+}
+.sheet-ability-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius);
+  padding: 8px 4px 6px;
+}
+.sheet-ability-box .sa-label {
+  font-family: var(--font-heading);
+  font-size: 0.6em;
+  font-weight: 700;
+  color: var(--heading);
+  letter-spacing: 0.07em;
+  display: block;
+}
+.sheet-ability-box .sa-val {
+  font-family: var(--font-mono);
+  font-size: 1.4em;
+  font-weight: 600;
+  color: var(--text);
+  display: block;
+  line-height: 1.1;
+}
+.sheet-ability-box .sa-mod {
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  color: var(--text-sec);
+  display: block;
+}
+
+/* Stat bars in sheet */
+.sheet-stat-bars { margin: 10px 0; }
+.sheet-stat-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+.sheet-stat-bar-row .bar-label {
+  font-family: var(--font-heading);
+  font-size: 0.65em;
+  font-weight: 700;
+  color: var(--heading);
+  letter-spacing: 0.07em;
+  width: 28px;
+  flex-shrink: 0;
+  text-align: right;
+}
+.sheet-stat-bar-row .bar-track {
+  flex: 1;
+  height: 7px;
+  background: var(--hp-track);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.sheet-stat-bar-row .bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--accent);
+  transition: width 0.6s ease;
+}
+.sheet-stat-bar-row .bar-num {
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  color: var(--text-sec);
+  width: 20px;
+  flex-shrink: 0;
+}
+
+/* Equipment & skills in sheet */
+.sheet-equip-line {
+  font-family: var(--font-body);
+  font-size: 0.88em;
+  color: var(--text);
+  margin: 3px 0;
+}
+.sheet-equip-line b { color: var(--heading); font-weight: 700; }
+.sheet-skills-list { list-style: none; margin: 6px 0; }
+.sheet-skills-list li {
+  font-size: 0.88em;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--border-faint);
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+.sheet-skills-list li:last-child { border-bottom: none; }
+.sheet-skill-bullet { color: var(--accent); font-size: 0.9em; }
+.sheet-skill-name { font-family: var(--font-heading); font-weight: 700; color: var(--heading); font-size: 0.88em; }
+.sheet-skill-desc { font-family: var(--font-body); color: var(--text-sec); font-style: italic; font-size: 0.95em; }
+
+/* Sheet actions */
+.sheet-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+/* ===================================================================
+   SETTINGS PANEL (slide-down overlay)
+   =================================================================== */
+#settings-panel {
+  display: none;
+  position: fixed;
+  top: 52px;
+  right: 0;
+  width: 280px;
+  background: var(--bg-overlay);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  padding: 20px;
+  box-shadow: 0 8px 24px var(--shadow-lg);
+  z-index: 200;
+  animation: slideDown 0.22s ease forwards;
+}
+#settings-panel.open { display: block; }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.settings-section-label {
+  font-family: var(--font-heading);
+  font-size: 0.7em;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  margin-top: 14px;
+}
+.settings-section-label:first-child { margin-top: 0; }
+.settings-btn-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.settings-option-btn {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  color: var(--text-sec);
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  font-family: var(--font-heading);
+  font-size: 0.75em;
+  letter-spacing: 0.05em;
+  transition: all var(--transition);
+}
+.settings-option-btn:hover { border-color: var(--accent); color: var(--accent); }
+.settings-option-btn.active { background: var(--btn-bg); color: var(--btn-text); border-color: var(--btn-bg); }
+
+/* ===================================================================
+   BUTTONS — SHARED
+   =================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 26px;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-heading);
+  font-size: 0.9em;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  white-space: nowrap;
+}
+.btn:hover {
+  background: var(--btn-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px var(--shadow);
+}
+.btn:active { transform: translateY(0); }
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text-sec);
+}
+.btn-outline:hover { border-color: var(--heading); color: var(--heading); background: transparent; }
+.btn-sm {
+  padding: 7px 16px;
+  font-size: 0.78em;
+}
+
+/* ===================================================================
+   DICE ANIMATION
+   =================================================================== */
+.dice-roll-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.d20-face {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--bg-stat);
+  border: 2px solid var(--border-stat);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 1em;
+  font-weight: 700;
+  color: var(--text);
+  transition: all 0.15s;
+}
+.d20-face.rolling {
+  animation: diceRoll 0.5s ease;
+  border-color: var(--accent);
+}
+.d20-face.nat20 {
+  background: var(--gold);
+  color: var(--bg-header);
+  border-color: var(--gold);
+  box-shadow: 0 0 8px rgba(200,169,81,0.5);
+}
+.d20-face.nat1 { background: var(--red); color: #fff; border-color: var(--red); }
+@keyframes diceRoll {
+  0%   { transform: rotate(0deg) scale(1); }
+  25%  { transform: rotate(-15deg) scale(1.1); }
+  50%  { transform: rotate(10deg) scale(0.95); }
+  75%  { transform: rotate(-5deg) scale(1.05); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+/* Floating damage numbers */
+.float-num {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.1em;
+  pointer-events: none;
+  animation: floatUp 1.1s ease forwards;
+  z-index: 50;
+}
+@keyframes floatUp {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  60%  { opacity: 1; transform: translateY(-36px) scale(1.15); }
+  100% { opacity: 0; transform: translateY(-60px) scale(0.9); }
+}
+
+/* Crit flash overlay */
+#crit-flash {
+  position: fixed; inset: 0;
+  background: rgba(200,169,81,0.18);
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0;
+}
+#crit-flash.flash { animation: critFlash 0.45s ease forwards; }
+@keyframes critFlash {
+  0%   { opacity: 0; }
+  20%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ===================================================================
+   SCREEN SHAKE
+   =================================================================== */
+#app.shake { animation: screenShake 0.35s ease; }
+@keyframes screenShake {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-4px); }
+  40%     { transform: translateX(4px); }
+  60%     { transform: translateX(-3px); }
+  80%     { transform: translateX(3px); }
+}
+
+/* ===================================================================
+   TOAST
+   =================================================================== */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--bg-header);
+  color: var(--btn-text);
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-family: var(--font-heading);
+  font-size: 0.82em;
+  letter-spacing: 0.06em;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 999;
+  white-space: nowrap;
+}
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ===================================================================
+   EMPTY STATE
+   =================================================================== */
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-faint);
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1em;
+}
+.empty-state .empty-icon { font-size: 2.5em; margin-bottom: 12px; opacity: 0.5; }
+
+/* ===================================================================
+   RESPONSIVE
+   =================================================================== */
+@media (max-width: 480px) {
+  #main { padding: 20px 14px 40px; }
+  .ability-scores { gap: 1px; }
+  .ability-box .ab-val { font-size: 1em; }
+  .char-sheet-card { padding: 18px 14px; }
+  .sheet-ability-grid { gap: 4px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Crit flash overlay -->
+<div id="crit-flash"></div>
+<!-- Toast notification -->
+<div id="toast"></div>
+
+<div id="app">
+
+  <!-- ===== TOPBAR ===== -->
+  <header id="topbar">
+    <span id="topbar-title">⚔ NAME ARENA</span>
+    <div class="topbar-controls">
+      <button class="topbar-btn" id="lang-toggle">EN</button>
+      <button class="topbar-btn" id="settings-toggle">⚙</button>
+    </div>
+  </header>
+
+  <!-- ===== SETTINGS PANEL ===== -->
+  <div id="settings-panel">
+    <div class="settings-section-label" data-i18n="settings_theme">THEME</div>
+    <div class="settings-btn-group">
+      <button class="settings-option-btn" data-theme-btn="phb">PHB Classic</button>
+      <button class="settings-option-btn" data-theme-btn="arcane">Arcane</button>
+      <button class="settings-option-btn" data-theme-btn="dragon">Dragon</button>
+    </div>
+    <div class="settings-section-label" data-i18n="settings_mode">MODE</div>
+    <div class="settings-btn-group">
+      <button class="settings-option-btn" data-mode-btn="light" data-i18n="mode_light">Light</button>
+      <button class="settings-option-btn" data-mode-btn="dark" data-i18n="mode_dark">Dark</button>
+      <button class="settings-option-btn" data-mode-btn="system" data-i18n="mode_system">System</button>
+    </div>
+  </div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main id="main">
+
+    <!-- ===========================
+         VIEW: LANDING
+         =========================== -->
+    <div id="view-landing" class="view active">
+      <div id="landing-crest" class="landing-crest">⚔</div>
+      <h1 class="landing-title" data-i18n="title">Name Arena</h1>
+      <div class="landing-subtitle">
+        <span data-i18n="subtitle_en">Enter a name. Forge a destiny.</span><br>
+        <span class="landing-subtitle-cn" data-i18n="subtitle_cn">输入名字，铸就命运</span>
+      </div>
+      <div class="mode-grid">
+        <div class="mode-card" id="btn-duel">
+          <div class="mode-card-icon">⚔</div>
+          <div class="mode-card-name" data-i18n="mode_duel">1v1 DUEL</div>
+          <div class="mode-card-cn" data-i18n="mode_duel_cn">1对1 决斗</div>
+        </div>
+        <div class="mode-card" id="btn-sheet">
+          <div class="mode-card-icon">📜</div>
+          <div class="mode-card-name" data-i18n="mode_sheet">CHARACTER</div>
+          <div class="mode-card-cn" data-i18n="mode_sheet_cn">角色卡查看</div>
+        </div>
+        <div class="mode-card disabled">
+          <div class="mode-card-icon">🏆</div>
+          <div class="mode-card-name" data-i18n="mode_tournament">TOURNAMENT</div>
+          <div class="mode-card-cn" data-i18n="mode_tournament_cn">锦标赛</div>
+          <span class="mode-card-badge" data-i18n="coming_soon">COMING SOON</span>
+        </div>
+        <div class="mode-card disabled">
+          <div class="mode-card-icon">💀</div>
+          <div class="mode-card-name" data-i18n="mode_boss">BOSS RUSH</div>
+          <div class="mode-card-cn" data-i18n="mode_boss_cn">Boss 挑战</div>
+          <span class="mode-card-badge" data-i18n="coming_soon">COMING SOON</span>
+        </div>
+      </div>
+      <hr class="ornament-divider">
+      <p style="font-family:var(--font-body);font-size:0.85em;color:var(--text-faint);font-style:italic;" data-i18n="landing_hint">
+        Same name always generates the same character. Same matchup always plays the same battle.
+      </p>
+    </div>
+
+    <!-- ===========================
+         VIEW: DUEL
+         =========================== -->
+    <div id="view-duel" class="view">
+      <div class="view-header">
+        <button class="back-btn" id="duel-back" data-i18n="back">← BACK</button>
+        <span class="view-title" data-i18n="duel_title">⚔ 1v1 DUEL</span>
+      </div>
+
+      <!-- Input row -->
+      <div class="duel-input-area">
+        <div class="name-field">
+          <span class="name-label" data-i18n="fighter_1">FIGHTER I</span>
+          <input class="name-input" id="name1" type="text" placeholder="张伟" maxlength="30" autocomplete="off">
+        </div>
+        <div class="vs-orb">VS</div>
+        <div class="name-field">
+          <span class="name-label" data-i18n="fighter_2">FIGHTER II</span>
+          <input class="name-input" id="name2" type="text" placeholder="李明" maxlength="30" autocomplete="off">
+        </div>
+      </div>
+      <div class="duel-actions">
+        <button class="btn" id="btn-fight" data-i18n="btn_fight">FIGHT!</button>
+      </div>
+
+      <!-- Character previews (shown after names entered) -->
+      <div class="char-grid" id="char-grid" style="display:none;">
+        <div id="stat-block-1" class="stat-block"></div>
+        <div id="stat-block-2" class="stat-block"></div>
+      </div>
+
+      <!-- HP bars -->
+      <div class="hp-bars-section" id="hp-bars" style="display:none;">
+        <div class="hp-bar-row">
+          <div class="hp-bar-labels">
+            <span class="hp-name" id="hp1-name">—</span>
+            <span id="hp1-text">—</span>
+          </div>
+          <div class="hp-track" style="position:relative;">
+            <div class="hp-fill" id="hp1-fill" data-pct="high" style="width:100%"></div>
+          </div>
+        </div>
+        <div class="hp-bar-row">
+          <div class="hp-bar-labels">
+            <span class="hp-name" id="hp2-name">—</span>
+            <span id="hp2-text">—</span>
+          </div>
+          <div class="hp-track" style="position:relative;">
+            <div class="hp-fill" id="hp2-fill" data-pct="high" style="width:100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Combat section -->
+      <div class="combat-section" id="combat-section" style="display:none;">
+        <div class="combat-controls">
+          <span class="combat-round-label" id="round-label" data-i18n="round_label">ROUND 0</span>
+          <div class="speed-controls">
+            <button class="speed-btn active" data-speed="1">1×</button>
+            <button class="speed-btn" data-speed="2">2×</button>
+            <button class="speed-btn" data-speed="4">4×</button>
+            <button class="speed-btn" data-speed="0" data-i18n="speed_instant">⏩</button>
+          </div>
+        </div>
+        <div class="combat-log" id="combat-log">
+          <div class="empty-state">
+            <div class="empty-icon">🎲</div>
+            <span data-i18n="log_empty">Battle log will appear here...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result banner -->
+      <div class="result-banner" id="result-banner">
+        <div class="result-winner" id="result-winner">—</div>
+        <div class="result-detail" id="result-detail">—</div>
+        <div class="result-actions">
+          <button class="btn btn-sm" id="btn-rematch" data-i18n="btn_rematch">REMATCH</button>
+          <button class="btn btn-outline btn-sm" id="btn-copy-result" data-i18n="btn_share">COPY RESULT</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===========================
+         VIEW: CHARACTER SHEET
+         =========================== -->
+    <div id="view-sheet" class="view">
+      <div class="view-header">
+        <button class="back-btn" id="sheet-back" data-i18n="back">← BACK</button>
+        <span class="view-title" data-i18n="sheet_title">📜 CHARACTER SHEET</span>
+      </div>
+      <div class="sheet-input-area">
+        <input class="name-input" id="sheet-name" type="text" placeholder="输入名字" maxlength="30" autocomplete="off">
+        <button class="btn" id="btn-generate-sheet" data-i18n="btn_generate">GENERATE</button>
+      </div>
+      <div id="sheet-output"></div>
+      <div class="sheet-actions" id="sheet-actions" style="display:none;">
+        <button class="btn btn-outline btn-sm" id="btn-copy-sheet" data-i18n="btn_copy_sheet">COPY TEXT</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ===================================================================
+     JAVASCRIPT — will be added in subsequent parts
+     =================================================================== -->
+<script>
+/* =====================================================================
+   I18N
+   ===================================================================== */
+const LANG = {
+  zh: {
+    title:'名字竞技场', subtitle_en:'输入名字，铸就命运', subtitle_cn:'',
+    mode_duel:'1V1 决斗', mode_duel_cn:'', mode_sheet:'角色卡', mode_sheet_cn:'',
+    mode_tournament:'锦标赛', mode_tournament_cn:'', mode_boss:'Boss 挑战', mode_boss_cn:'',
+    coming_soon:'即将推出', landing_hint:'同一名字永远生成同一角色。同一对阵永远重演同一战斗。',
+    back:'← 返回', duel_title:'⚔ 1V1 决斗', fighter_1:'战士 I', fighter_2:'战士 II',
+    btn_fight:'决斗！', btn_rematch:'再战', btn_share:'复制结果', btn_generate:'生成',
+    btn_copy_sheet:'复制文字', sheet_title:'📜 角色卡',
+    settings_theme:'主题皮肤', settings_mode:'明暗模式',
+    mode_light:'浅色', mode_dark:'深色', mode_system:'跟随系统',
+    round_label:'第 {n} 回合', speed_instant:'⏩ 跳过', log_empty:'战斗日志将在此显示...',
+    wins:'获胜', rounds:'回合', vs:'对战',
+    initiative:'先攻', attacks:'攻击', hits:'命中', miss:'未命中', crit:'暴击！！',
+    damage:'{n}点{type}伤害', heals:'恢复{n}点生命', saves_ok:'豁免成功', saves_fail:'豁免失败',
+    skill_use:'使用{skill}！', knock_out:'{name}倒下了！', timeout:'超时判定',
+  },
+  en: {
+    title:'Name Arena', subtitle_en:'Enter a name. Forge a destiny.', subtitle_cn:'输入名字，铸就命运',
+    mode_duel:'1V1 DUEL', mode_duel_cn:'1对1 决斗', mode_sheet:'CHARACTER', mode_sheet_cn:'角色卡',
+    mode_tournament:'TOURNAMENT', mode_tournament_cn:'锦标赛', mode_boss:'BOSS RUSH', mode_boss_cn:'Boss挑战',
+    coming_soon:'COMING SOON', landing_hint:'Same name always generates the same character. Same matchup always plays the same battle.',
+    back:'← BACK', duel_title:'⚔ 1v1 DUEL', fighter_1:'FIGHTER I', fighter_2:'FIGHTER II',
+    btn_fight:'FIGHT!', btn_rematch:'REMATCH', btn_share:'COPY RESULT', btn_generate:'GENERATE',
+    btn_copy_sheet:'COPY TEXT', sheet_title:'📜 CHARACTER SHEET',
+    settings_theme:'THEME', settings_mode:'MODE',
+    mode_light:'Light', mode_dark:'Dark', mode_system:'System',
+    round_label:'ROUND {n}', speed_instant:'⏩', log_empty:'Battle log will appear here...',
+    wins:'wins', rounds:'rounds', vs:'vs',
+    initiative:'Initiative', attacks:'attacks', hits:'Hit', miss:'Miss', crit:'CRITICAL HIT!!',
+    damage:'{n} {type} damage', heals:'Heals {n} HP', saves_ok:'Save success', saves_fail:'Save failed',
+    skill_use:'uses {skill}!', knock_out:'{name} is defeated!', timeout:'Timeout — lower HP% loses',
+  }
+};
+let currentLang = localStorage.getItem('arena_lang') || 'zh';
+function t(key, params={}) {
+  let s = (LANG[currentLang]||LANG.en)[key] || (LANG.en)[key] || key;
+  for (const [k,v] of Object.entries(params)) s = s.replace('{'+k+'}', v);
+  return s;
+}
+
+/* =====================================================================
+   NAME HASHER — FNV-1a + xorshift128 PRNG
+   ===================================================================== */
+const NameHasher = {
+  // FNV-1a over Unicode codepoints → 32-bit seed
+  hash(name) {
+    let h = 2166136261;
+    for (const cp of name) {
+      const c = cp.codePointAt(0);
+      h ^= c;
+      h = Math.imul(h, 16777619);
+      h >>>= 0;
+    }
+    return h >>> 0;
+  },
+
+  // splitmix32 to expand seed into 4×32-bit xorshift128 state
+  seededRNG(seed) {
+    let s = seed >>> 0;
+    function sm() {
+      s = (s + 0x9e3779b9) >>> 0;
+      let z = s;
+      z = Math.imul(z ^ (z >>> 16), 0x85ebca6b) >>> 0;
+      z = Math.imul(z ^ (z >>> 13), 0xc2b2ae35) >>> 0;
+      return (z ^ (z >>> 16)) >>> 0;
+    }
+    let [a,b,c,d] = [sm(),sm(),sm(),sm()];
+    return function next() {
+      let t = (b << 9) >>> 0;
+      let r = Math.imul(a, 0x9e3779bb) >>> 0;
+      r = ((r >>> 11) ^ r) >>> 0;
+      c ^= a; d ^= b; b = ((b << 9)|(b >>> 23)) >>> 0; b ^= c;
+      a ^= d; c = ((c << 11)|(c >>> 21)) >>> 0; d = (d + 0x9e3779b9) >>> 0;
+      [a,b,c,d] = [b>>>0, c>>>0, d>>>0, (a^t^r)>>>0];
+      return (a >>> 0) / 4294967296;
+    };
+  },
+
+  // Roll 4d6 drop lowest, range 3–18, D&D standard
+  roll4d6(rng) {
+    const dice = [1,2,3,4].map(() => Math.floor(rng()*6)+1);
+    return dice.reduce((a,b)=>a+b,0) - Math.min(...dice);
+  },
+
+  rollD(rng, sides) { return Math.floor(rng()*sides)+1; },
+
+  // Generate 6 stats with total normalized to 65–82
+  genStats(rng) {
+    let stats = [0,0,0,0,0,0].map(()=>this.roll4d6(rng));
+    let total = stats.reduce((a,b)=>a+b,0);
+    // Nudge toward 65–82 range
+    while (total < 65) {
+      const i = stats.indexOf(Math.min(...stats));
+      stats[i] = Math.min(18, stats[i]+1); total++;
+    }
+    while (total > 82) {
+      const i = stats.indexOf(Math.max(...stats));
+      stats[i] = Math.max(8, stats[i]-1); total--;
+    }
+    return stats; // [str,dex,con,int,wis,cha]
+  }
+};
+
+/* =====================================================================
+   CLASS DATA — 12 D&D classes, each with full combat definition
+   ===================================================================== */
+const CLASSES = {
+  fighter: {
+    name:{zh:'战士',en:'Fighter'}, icon:'⚔',
+    primaryStats:['str'],
+    hitDie:10, acBase:16, acUseDex:false, acDexCap:0,
+    attackStat:'str', damageDie:10, extraAttacks:1,
+    isCaster:false,
+    equipment:{zh:'长剑与盾牌',en:'Longsword & Shield'},
+    armor:{zh:'锁甲',en:'Chain Mail'},
+    titleAdj:{zh:['铁血','钢铁','不屈','赤焰','霜刃'],en:['Iron','Steel','Unyielding','Crimson','Frostbite']},
+    titleNoun:{zh:['骑士','勇士','卫士','斗士','猎手'],en:['Knight','Champion','Warden','Sentinel','Hunter']},
+    skills:[
+      { id:'action_surge', name:{zh:'动作如潮',en:'Action Surge'},
+        desc:{zh:'额外行动，再打一轮攻击',en:'Take an extra action — attack again'},
+        uses:1, trigger:'active', timing:'start_of_turn',
+        condition:(c)=>c.round>=3, priority:70,
+        effect(self,target,eng){eng.extraAttackThisTurn=true; return null;} },
+      { id:'second_wind', name:{zh:'再振旗鼓',en:'Second Wind'},
+        desc:{zh:'恢复1d10+5点生命',en:'Heal 1d10+5 HP'},
+        uses:1, trigger:'active', timing:'bonus',
+        condition:(c)=>c.self.currentHP<c.self.maxHP*0.5, priority:80,
+        effect(self,target,eng){
+          const h=eng.rollD(1,10)+5;
+          self.currentHP=Math.min(self.maxHP,self.currentHP+h);
+          eng.log({type:'heal',actor:self.name,data:{amount:h,skill:'Second Wind'}});
+          return null;} },
+      { id:'defense_style', name:{zh:'防御姿态',en:'Defense Style'},
+        desc:{zh:'AC+1（被动）',en:'+1 AC (passive)'},
+        uses:Infinity, trigger:'passive',
+        onInit(self){self.ac+=1;} }
+    ]
+  },
+
+  barbarian: {
+    name:{zh:'野蛮人',en:'Barbarian'}, icon:'🪓',
+    primaryStats:['str'],
+    hitDie:12, acBase:10, acUseDex:true, acUseCon:true, acDexCap:99,
+    attackStat:'str', damageDie:12, extraAttacks:1,
+    isCaster:false,
+    equipment:{zh:'巨斧',en:'Greataxe'},
+    armor:{zh:'无甲（体质加成）',en:'Unarmored (CON bonus)'},
+    titleAdj:{zh:['狂暴','无畏','血腥','雷霆','荒野'],en:['Raging','Fearless','Bloodied','Thunder','Primal']},
+    titleNoun:{zh:['狂战士','破坏者','猛兽','风暴','毁灭者'],en:['Berserker','Destroyer','Beast','Storm','Ravager']},
+    skills:[
+      { id:'rage', name:{zh:'狂暴',en:'Rage'},
+        desc:{zh:'攻击+2伤害，物理伤害减半（持续战斗）',en:'+2 damage, resistance to physical damage'},
+        uses:3, trigger:'active', timing:'bonus',
+        condition:(c)=>!c.self.conditions.has('raging'), priority:100,
+        effect(self,target,eng){
+          self.conditions.set('raging',{damageBonus:2,resist:['slashing','piercing','bludgeoning']});
+          eng.log({type:'skill',actor:self.name,data:{skill:t('skill_use',{skill:'Rage'})}});
+          return null;} },
+      { id:'reckless', name:{zh:'鲁莽攻击',en:'Reckless Attack'},
+        desc:{zh:'攻击检定获得优势',en:'Advantage on attack rolls this turn'},
+        uses:Infinity, trigger:'passive',
+        onAttack(self){return {advantage:true};} },
+      { id:'danger_sense', name:{zh:'危机感知',en:'Danger Sense'},
+        desc:{zh:'敏捷豁免获得优势',en:'Advantage on DEX saving throws'},
+        uses:Infinity, trigger:'passive',
+        onSave(self,type){return type==='dex'?{advantage:true}:null;} }
+    ]
+  },
+
+  rogue: {
+    name:{zh:'游荡者',en:'Rogue'}, icon:'🗡',
+    primaryStats:['dex'],
+    hitDie:8, acBase:12, acUseDex:true, acDexCap:99,
+    attackStat:'dex', damageDie:8, extraAttacks:0,
+    isCaster:false,
+    equipment:{zh:'细剑',en:'Rapier'},
+    armor:{zh:'皮甲',en:'Studded Leather'},
+    titleAdj:{zh:['暗影','无声','狡诈','幽灵','迅捷'],en:['Shadow','Silent','Cunning','Phantom','Swift']},
+    titleNoun:{zh:['刺客','幽灵','毒蛇','影者','窃贼'],en:['Blade','Ghost','Viper','Shade','Trickster']},
+    skills:[
+      { id:'sneak_attack', name:{zh:'偷袭',en:'Sneak Attack'},
+        desc:{zh:'每回合首次命中额外3d6伤害',en:'Extra 3d6 damage once per turn on a hit'},
+        uses:Infinity, trigger:'passive',
+        onHit(self,target,eng){
+          if(!self._sneakUsed){self._sneakUsed=true; return eng.rollD(3,6);}
+          return 0;} },
+      { id:'uncanny_dodge', name:{zh:'灵敏闪避',en:'Uncanny Dodge'},
+        desc:{zh:'对一次攻击的伤害减半（反应）',en:'Halve damage from one attack (reaction)'},
+        uses:1, trigger:'passive',
+        onDamaged(self,dmg){
+          if(!self._dodgeUsed){self._dodgeUsed=true; return Math.floor(dmg/2);}
+          return dmg;} },
+      { id:'evasion', name:{zh:'闪躲',en:'Evasion'},
+        desc:{zh:'敏捷豁免成功则不受伤害',en:'DEX save success → take no damage'},
+        uses:Infinity, trigger:'passive' }
+    ]
+  },
+
+  paladin: {
+    name:{zh:'圣骑士',en:'Paladin'}, icon:'🛡',
+    primaryStats:['str','cha'],
+    hitDie:10, acBase:18, acUseDex:false, acDexCap:0,
+    attackStat:'str', damageDie:8, extraAttacks:1,
+    isCaster:true, saveDCStat:'cha',
+    equipment:{zh:'长剑与重盾',en:'Longsword & Shield'},
+    armor:{zh:'全身板甲',en:'Plate Mail'},
+    titleAdj:{zh:['神圣','光明','誓约','银辉','圣洁'],en:['Holy','Radiant','Oath','Silver','Sacred']},
+    titleNoun:{zh:['圣骑士','守护者','审判者','誓约者','圣战士'],en:['Paladin','Guardian','Justiciar','Oathkeeper','Crusader']},
+    skills:[
+      { id:'divine_smite', name:{zh:'神圣惩击',en:'Divine Smite'},
+        desc:{zh:'命中时额外2d8辐射伤害（每次）',en:'On hit, extra 2d8 radiant damage'},
+        uses:4, trigger:'passive',
+        onHit(self,target,eng){
+          if(self._smiteUses>0){self._smiteUses--;return eng.rollD(2,8);} return 0;} },
+      { id:'lay_on_hands', name:{zh:'圣疗之手',en:'Lay on Hands'},
+        desc:{zh:'恢复25点生命值（主动）',en:'Heal 25 HP (action)'},
+        uses:1, trigger:'active', timing:'bonus',
+        condition:(c)=>c.self.currentHP<c.self.maxHP*0.35, priority:90,
+        effect(self,target,eng){
+          const h=25; self.currentHP=Math.min(self.maxHP,self.currentHP+h);
+          eng.log({type:'heal',actor:self.name,data:{amount:h,skill:'Lay on Hands'}});
+          return null;} },
+      { id:'aura_protection', name:{zh:'守护光环',en:'Aura of Protection'},
+        desc:{zh:'豁免检定加CHA修正（被动）',en:'Add CHA mod to saving throws (passive)'},
+        uses:Infinity, trigger:'passive',
+        onInit(self){self.saveBonus=(self.saveBonus||0)+self.chaMod;} }
+    ]
+  },
+
+  ranger: {
+    name:{zh:'游侠',en:'Ranger'}, icon:'🏹',
+    primaryStats:['dex','wis'],
+    hitDie:10, acBase:14, acUseDex:true, acDexCap:2,
+    attackStat:'dex', damageDie:8, extraAttacks:1,
+    isCaster:true, saveDCStat:'wis',
+    equipment:{zh:'长弓',en:'Longbow'},
+    armor:{zh:'鳞甲',en:'Scale Mail'},
+    titleAdj:{zh:['荒野','猎风','苍鹰','孤狼','林影'],en:['Wildwood','Hawkeye','Lone','Verdant','Ranger']},
+    titleNoun:{zh:['猎手','游侠','鹰眼','行者','哨兵'],en:['Hunter','Ranger','Scout','Tracker','Sentinel']},
+    skills:[
+      { id:'hunters_mark', name:{zh:'猎人印记',en:"Hunter's Mark"},
+        desc:{zh:'每次命中额外1d6伤害（法术加成）',en:'Extra 1d6 on every hit'},
+        uses:2, trigger:'active', timing:'bonus',
+        condition:(c)=>!c.self.conditions.has('hunters_mark'), priority:100,
+        effect(self,target,eng){
+          self.conditions.set('hunters_mark',{bonusDie:[1,6]});
+          eng.log({type:'skill',actor:self.name,data:{skill:"Hunter's Mark"}});
+          return null;} },
+      { id:'colossus_slayer', name:{zh:'斩巨术',en:'Colossus Slayer'},
+        desc:{zh:'攻击受伤目标额外1d8（每回合一次）',en:'Extra 1d8 vs wounded target (once/turn)'},
+        uses:Infinity, trigger:'passive',
+        onHit(self,target,eng){
+          if(target.currentHP<target.maxHP&&!self._colossusUsed){
+            self._colossusUsed=true; return eng.rollD(1,8);}
+          return 0;} },
+      { id:'archery_style', name:{zh:'射击姿态',en:'Archery Style'},
+        desc:{zh:'远程攻击检定+2（被动）',en:'+2 to ranged attack rolls (passive)'},
+        uses:Infinity, trigger:'passive',
+        onInit(self){self.attackBonus+=2;} }
+    ]
+  },
+
+  monk: {
+    name:{zh:'武僧',en:'Monk'}, icon:'👊',
+    primaryStats:['dex'],
+    hitDie:8, acBase:10, acUseDex:true, acUseWis:true, acDexCap:99,
+    attackStat:'dex', damageDie:8, extraAttacks:1,
+    isCaster:false,
+    equipment:{zh:'无武器（武术）',en:'Unarmed (Martial Arts)'},
+    armor:{zh:'无甲（敏捷+感知）',en:'Unarmored (DEX+WIS)'},
+    titleAdj:{zh:['禅心','疾风','虚空','铁拳','无我'],en:['Zen','Tempest','Void','Iron','Selfless']},
+    titleNoun:{zh:['武僧','拳师','空手者','行者','悟者'],en:['Monk','Striker','Fist','Wanderer','Master']},
+    skills:[
+      { id:'flurry', name:{zh:'疾风连击',en:'Flurry of Blows'},
+        desc:{zh:'奖励动作：额外2次近战攻击',en:'Bonus action: 2 extra unarmed strikes'},
+        uses:5, trigger:'active', timing:'bonus',
+        condition:(c)=>c.self._ki>0, priority:60,
+        effect(self,target,eng){
+          self._ki--;
+          for(let i=0;i<2;i++){
+            const roll=eng.attackRoll(self,target);
+            if(roll.hit){const d=eng.damageRoll(self,target,roll.crit,'bludgeoning'); eng.applyDamage(target,d,self);}
+            eng.log({type:'attack',actor:self.name,target:target.name,data:{roll,skill:'Flurry'}});
+          }
+          return null;} },
+      { id:'stunning_strike', name:{zh:'震慑打击',en:'Stunning Strike'},
+        desc:{zh:'命中后目标体质豁免，失败则昏迷1回合',en:'On hit: CON save or target is stunned 1 turn'},
+        uses:3, trigger:'passive',
+        onHit(self,target,eng){
+          if(self._ki>0&&!target.conditions.has('stunned')&&Math.random()<0.4){
+            self._ki--;
+            const saved=eng.savingThrow(target,'con',8+self.proficiencyBonus+self.wisMod);
+            if(!saved){target.conditions.set('stunned',{rounds:1});
+              eng.log({type:'condition',actor:self.name,target:target.name,data:{effect:'Stunning Strike',saved}});}
+          } return 0;} },
+      { id:'patient_defense', name:{zh:'沉稳防御',en:'Patient Defense'},
+        desc:{zh:'奖励动作：回避，攻击者劣势',en:'Bonus: Dodge — attackers have disadvantage'},
+        uses:5, trigger:'active', timing:'bonus',
+        condition:(c)=>c.self.currentHP<c.self.maxHP*0.5&&c.self._ki>0, priority:75,
+        effect(self,target,eng){
+          self._ki--; self.conditions.set('dodging',{rounds:1});
+          eng.log({type:'skill',actor:self.name,data:{skill:'Patient Defense'}}); return null;} }
+    ]
+  },
+
+  wizard: {
+    name:{zh:'法师',en:'Wizard'}, icon:'🔮',
+    primaryStats:['int'],
+    hitDie:6, acBase:13, acUseDex:true, acDexCap:99,
+    attackStat:'int', damageDie:10, extraAttacks:0,
+    isCaster:true, saveDCStat:'int',
+    equipment:{zh:'法杖',en:'Arcane Staff'},
+    armor:{zh:'法师护甲',en:'Mage Armor'},
+    titleAdj:{zh:['奥术','星界','远古','神秘','紫晶'],en:['Arcane','Astral','Ancient','Mystic','Amethyst']},
+    titleNoun:{zh:['法师','术士','学者','织法者','星占师'],en:['Mage','Arcanist','Scholar','Spellweaver','Oracle']},
+    skills:[
+      { id:'fireball', name:{zh:'火球术',en:'Fireball'},
+        desc:{zh:'目标敏捷豁免，8d6火焰伤害（失败全伤/成功减半）',en:'DEX save: 8d6 fire (fail=full, pass=half)'},
+        uses:1, trigger:'active', timing:'action',
+        condition:(c)=>c.target.currentHP>c.target.maxHP*0.3, priority:90,
+        effect(self,target,eng){
+          const dmg=eng.rollD(8,6);
+          const saved=eng.savingThrow(target,'dex',self.spellSaveDC);
+          const final=saved?Math.floor(dmg/2):dmg;
+          eng.log({type:'spell',actor:self.name,target:target.name,data:{spell:'Fireball',roll:dmg,saved,final,dmgType:'fire'}});
+          eng.applyDamage(target,final,self); return null;} },
+      { id:'shield_spell', name:{zh:'护盾术',en:'Shield'},
+        desc:{zh:'被攻击时+5 AC直到下回合（反应）',en:'Reaction: +5 AC until next turn'},
+        uses:2, trigger:'passive',
+        onAttacked(self,eng){
+          if(!self._shieldUsed&&self._shieldCharges>0){
+            self._shieldUsed=true; self._shieldCharges--;
+            self.ac+=5; self._shieldActive=true;
+            eng.log({type:'skill',actor:self.name,data:{skill:'Shield (+5 AC)'}});
+          }} },
+      { id:'magic_missile', name:{zh:'魔法飞弹',en:'Magic Missile'},
+        desc:{zh:'自动命中，3×(1d4+1)力场伤害',en:'Auto-hit: 3×(1d4+1) force damage'},
+        uses:2, trigger:'active', timing:'action',
+        condition:(c)=>!c.self.skills.find(s=>s.id==='fireball')||c.self._fireball_used, priority:55,
+        effect(self,target,eng){
+          const dmg=eng.rollD(3,4)+3;
+          eng.log({type:'spell',actor:self.name,target:target.name,data:{spell:'Magic Missile',final:dmg,dmgType:'force',autoHit:true}});
+          eng.applyDamage(target,dmg,self); return null;} }
+    ]
+  },
+
+  cleric: {
+    name:{zh:'牧师',en:'Cleric'}, icon:'✝',
+    primaryStats:['wis'],
+    hitDie:8, acBase:16, acUseDex:true, acDexCap:2,
+    attackStat:'wis', damageDie:8, extraAttacks:0,
+    isCaster:true, saveDCStat:'wis',
+    equipment:{zh:'圣杖与盾牌',en:'Mace & Shield'},
+    armor:{zh:'锁甲加盾',en:'Chain Mail & Shield'},
+    titleAdj:{zh:['神圣','光辉','天启','庇护','祝福'],en:['Divine','Radiant','Holy','Blessed','Sacred']},
+    titleNoun:{zh:['牧师','圣职者','治愈者','先知','守护者'],en:['Cleric','Priest','Healer','Prophet','Protector']},
+    skills:[
+      { id:'spirit_guardians', name:{zh:'灵体卫士',en:'Spirit Guardians'},
+        desc:{zh:'敌人每回合开始受3d8辐射伤害（感知豁免减半）',en:'Enemy takes 3d8 radiant each turn (WIS save=half)'},
+        uses:1, trigger:'active', timing:'action',
+        condition:(c)=>!c.self.conditions.has('sg_active'), priority:95,
+        effect(self,target,eng){
+          self.conditions.set('sg_active',{dmgDice:[3,8],saveType:'wis',dc:self.spellSaveDC});
+          eng.log({type:'skill',actor:self.name,data:{skill:'Spirit Guardians'}}); return null;} },
+      { id:'healing_word', name:{zh:'治疗之语',en:'Healing Word'},
+        desc:{zh:'奖励动作：恢复1d4+感知修正生命',en:'Bonus action: heal 1d4+WIS mod'},
+        uses:3, trigger:'active', timing:'bonus',
+        condition:(c)=>c.self.currentHP<c.self.maxHP*0.6, priority:85,
+        effect(self,target,eng){
+          const h=eng.rollD(1,4)+self.wisMod;
+          self.currentHP=Math.min(self.maxHP,self.currentHP+h);
+          eng.log({type:'heal',actor:self.name,data:{amount:h,skill:'Healing Word'}}); return null;} },
+      { id:'sacred_flame', name:{zh:'圣火术',en:'Sacred Flame'},
+        desc:{zh:'目标敏捷豁免，2d8辐射伤害（无限）',en:'DEX save: 2d8 radiant (cantrip, unlimited)'},
+        uses:Infinity, trigger:'active', timing:'action',
+        condition:(c)=>true, priority:40,
+        effect(self,target,eng){
+          const dmg=eng.rollD(2,8);
+          const saved=eng.savingThrow(target,'dex',self.spellSaveDC);
+          const final=saved?0:dmg;
+          if(final>0){eng.applyDamage(target,final,self);}
+          eng.log({type:'spell',actor:self.name,target:target.name,data:{spell:'Sacred Flame',final,saved,dmgType:'radiant'}});
+          return null;} }
+    ]
+  },
+
+  sorcerer: {
+    name:{zh:'术士',en:'Sorcerer'}, icon:'💫',
+    primaryStats:['cha'],
+    hitDie:6, acBase:13, acUseDex:true, acDexCap:99,
+    attackStat:'cha', damageDie:10, extraAttacks:0,
+    isCaster:true, saveDCStat:'cha',
+    equipment:{zh:'法师之杖',en:'Sorcerer Staff'},
+    armor:{zh:'法师护甲',en:'Mage Armor'},
+    titleAdj:{zh:['天生','奥秘','混沌','熔岩','星河'],en:['Innate','Arcane','Wild','Blazing','Stellar']},
+    titleNoun:{zh:['术士','魔血者','混沌源','血脉者','天生法师'],en:['Sorcerer','Bloodmage','Wildborn','Conduit','Spellblood']},
+    skills:[
+      { id:'chromatic_orb', name:{zh:'七彩法球',en:'Chromatic Orb'},
+        desc:{zh:'法术攻击，3d8元素伤害',en:'Spell attack: 3d8 elemental damage'},
+        uses:3, trigger:'active', timing:'action',
+        condition:(c)=>true, priority:70,
+        effect(self,target,eng){
+          const roll=eng.spellAttackRoll(self,target);
+          if(roll.hit){
+            const dmg=eng.rollD(3,8);
+            eng.log({type:'spell',actor:self.name,target:target.name,data:{spell:'Chromatic Orb',roll:roll.total,hit:true,final:dmg,dmgType:'elemental',crit:roll.crit}});
+            eng.applyDamage(target,roll.crit?dmg+eng.rollD(3,8):dmg,self);
+          } else { eng.log({type:'spell',actor:self.name,target:target.name,data:{spell:'Chromatic Orb',hit:false}}); }
+          return null;} },
+      { id:'twin_spell', name:{zh:'孪生法术',en:'Twinned Spell'},
+        desc:{zh:'每场战斗一次：法术伤害×1.5',en:'Once per battle: spell damage ×1.5'},
+        uses:1, trigger:'active', timing:'bonus',
+        condition:(c)=>c.self._twinReady&&!c.self._twinUsed, priority:65,
+        effect(self,target,eng){self._twinActive=true; self._twinUsed=true;
+          eng.log({type:'skill',actor:self.name,data:{skill:'Twinned Spell'}}); return null;} },
+      { id:'quicken', name:{zh:'瞬发法术',en:'Quickened Spell'},
+        desc:{zh:'奖励动作释放一次伤害法术',en:'Cast a damage spell as a bonus action'},
+        uses:2, trigger:'passive' }
+    ]
+  },
+
+  warlock: {
+    name:{zh:'邪术师',en:'Warlock'}, icon:'👁',
+    primaryStats:['cha'],
+    hitDie:8, acBase:12, acUseDex:true, acDexCap:99,
+    attackStat:'cha', damageDie:10, extraAttacks:0, beams:2,
+    isCaster:true, saveDCStat:'cha',
+    equipment:{zh:'魔契之书',en:'Pact Tome'},
+    armor:{zh:'皮甲',en:'Leather Armor'},
+    titleAdj:{zh:['契约','深渊','暗主','恶魔','异界'],en:['Pact','Abyssal','Voidborn','Infernal','Eldritch']},
+    titleNoun:{zh:['邪术师','契约者','诅咒者','异能者','深渊行者'],en:['Warlock','Pactmaker','Hexer','Channeler','Voidwalker']},
+    skills:[
+      { id:'eldritch_blast', name:{zh:'魔能爆',en:'Eldritch Blast'},
+        desc:{zh:'2束魔能：每束1d10+CHA修正（力场伤害）',en:'2 beams: each 1d10+CHA mod (force)'},
+        uses:Infinity, trigger:'passive' },
+      { id:'hex', name:{zh:'妖火诅咒',en:'Hex'},
+        desc:{zh:'奖励动作：标记目标，每次命中额外1d6（持续）',en:'Bonus: mark target, +1d6 on every hit'},
+        uses:2, trigger:'active', timing:'bonus',
+        condition:(c)=>!c.self.conditions.has('hex_active'), priority:100,
+        effect(self,target,eng){
+          self.conditions.set('hex_active',{bonusDie:[1,6],target:target.name});
+          eng.log({type:'skill',actor:self.name,data:{skill:'Hex'}}); return null;} },
+      { id:'armor_agathys', name:{zh:'阿格西斯之甲',en:'Armor of Agathys'},
+        desc:{zh:'获得15点临时生命，近战攻击者受15点冰霜伤害',en:'15 temp HP; melee attackers take 15 cold'},
+        uses:1, trigger:'active', timing:'bonus',
+        condition:(c)=>!c.self._agathysDone&&c.self.currentHP===c.self.maxHP, priority:95,
+        effect(self,target,eng){
+          self.tempHP=(self.tempHP||0)+15; self._agathysDone=true;
+          self.conditions.set('agathys',{reflect:15,type:'cold'});
+          eng.log({type:'skill',actor:self.name,data:{skill:'Armor of Agathys (+15 temp HP)'}}); return null;} }
+    ]
+  },
+
+  bard: {
+    name:{zh:'吟游诗人',en:'Bard'}, icon:'🎵',
+    primaryStats:['cha'],
+    hitDie:8, acBase:12, acUseDex:true, acDexCap:99,
+    attackStat:'dex', damageDie:8, extraAttacks:0,
+    isCaster:true, saveDCStat:'cha',
+    equipment:{zh:'细剑与琉特琴',en:'Rapier & Lute'},
+    armor:{zh:'皮甲',en:'Leather Armor'},
+    titleAdj:{zh:['如歌','魅影','传奇','银舌','旋律'],en:['Melodic','Charming','Legendary','Silvered','Lyrical']},
+    titleNoun:{zh:['诗人','歌者','传说者','吟唱者','乐师'],en:['Bard','Singer','Legend','Minstrel','Lyrist']},
+    skills:[
+      { id:'vicious_mockery', name:{zh:'恶毒嘲讽',en:'Vicious Mockery'},
+        desc:{zh:'目标感知豁免，2d4精神伤害+攻击劣势',en:'WIS save: 2d4 psychic + disadvantage on attacks'},
+        uses:Infinity, trigger:'active', timing:'action',
+        condition:(c)=>true, priority:50,
+        effect(self,target,eng){
+          const saved=eng.savingThrow(target,'wis',self.spellSaveDC);
+          if(!saved){
+            const dmg=eng.rollD(2,4);
+            target.conditions.set('mocked',{rounds:1});
+            eng.applyDamage(target,dmg,self);
+            eng.log({type:'spell',actor:self.name,target:target.name,data:{spell:'Vicious Mockery',saved,final:dmg,dmgType:'psychic'}});
+          } else {
+            eng.log({type:'spell',actor:self.name,target:target.name,data:{spell:'Vicious Mockery',saved,final:0}});
+          } return null;} },
+      { id:'cutting_words', name:{zh:'讥讽之词',en:'Cutting Words'},
+        desc:{zh:'反应：减少敌人攻击骰1d8',en:'Reaction: subtract 1d8 from enemy attack roll'},
+        uses:3, trigger:'passive',
+        onAttacked(self,eng,attackRoll){
+          if(self._cwCharges>0){
+            self._cwCharges--;
+            const sub=eng.rollD(1,8);
+            eng.log({type:'skill',actor:self.name,data:{skill:'Cutting Words (-'+sub+')'}});
+            return -sub;}
+          return 0;} },
+      { id:'bard_healing', name:{zh:'治疗之语',en:'Healing Word'},
+        desc:{zh:'奖励动作：恢复1d4+CHA修正生命',en:'Bonus action: heal 1d4+CHA mod'},
+        uses:3, trigger:'active', timing:'bonus',
+        condition:(c)=>c.self.currentHP<c.self.maxHP*0.55, priority:80,
+        effect(self,target,eng){
+          const h=eng.rollD(1,4)+self.chaMod;
+          self.currentHP=Math.min(self.maxHP,self.currentHP+h);
+          eng.log({type:'heal',actor:self.name,data:{amount:h,skill:'Healing Word'}}); return null;} }
+    ]
+  },
+
+  druid: {
+    name:{zh:'德鲁伊',en:'Druid'}, icon:'🌿',
+    primaryStats:['wis'],
+    hitDie:8, acBase:14, acUseDex:true, acDexCap:2,
+    attackStat:'wis', damageDie:8, extraAttacks:0,
+    isCaster:true, saveDCStat:'wis',
+    equipment:{zh:'木杖',en:'Druidic Staff'},
+    armor:{zh:'皮革护甲',en:'Hide Armor'},
+    titleAdj:{zh:['自然','原野','月光','古树','荒原'],en:['Natural','Wildborn','Moonlit','Ancientwood','Feral']},
+    titleNoun:{zh:['德鲁伊','自然守卫','月裔','树灵者','荒野行者'],en:['Druid','Natureguard','Moonchild','Treewalker','Wildshaper']},
+    skills:[
+      { id:'call_lightning', name:{zh:'召唤闪电',en:'Call Lightning'},
+        desc:{zh:'每回合3d10闪电伤害（感知豁免减半）',en:'Each turn: 3d10 lightning (WIS save=half)'},
+        uses:1, trigger:'active', timing:'action',
+        condition:(c)=>!c.self.conditions.has('lightning_active'), priority:90,
+        effect(self,target,eng){
+          self.conditions.set('lightning_active',{dmgDice:[3,10],saveType:'wis',dc:self.spellSaveDC,turns:5});
+          eng.log({type:'skill',actor:self.name,data:{skill:'Call Lightning'}}); return null;} },
+      { id:'wild_shape', name:{zh:'野性变身',en:'Wild Shape'},
+        desc:{zh:'变为棕熊，获得34点临时生命值',en:'Bear form: gain 34 temp HP'},
+        uses:2, trigger:'active', timing:'bonus',
+        condition:(c)=>c.self.currentHP<c.self.maxHP*0.4, priority:85,
+        effect(self,target,eng){
+          self.tempHP=(self.tempHP||0)+34;
+          eng.log({type:'skill',actor:self.name,data:{skill:'Wild Shape (Bear Form +34 temp HP)'}}); return null;} },
+      { id:'entangle', name:{zh:'纠缠术',en:'Entangle'},
+        desc:{zh:'目标力量豁免，失败则束缚（攻击劣势，被攻击优势）',en:'STR save or restrained — adv/disadv on attacks'},
+        uses:1, trigger:'active', timing:'action',
+        condition:(c)=>!c.target.conditions.has('restrained')&&c.self.round<3, priority:80,
+        effect(self,target,eng){
+          const saved=eng.savingThrow(target,'str',self.spellSaveDC);
+          if(!saved) target.conditions.set('restrained',{rounds:2});
+          eng.log({type:'spell',actor:self.name,target:target.name,data:{spell:'Entangle',saved}});
+          return null;} }
+    ]
+  }
+};
+
+/* =====================================================================
+   CHARACTER — builds a full D&D character from a name
+   ===================================================================== */
+class Character {
+  constructor(name) {
+    this.name = name.trim() || '???';
+    const seed = NameHasher.hash(this.name);
+    const rng  = NameHasher.seededRNG(seed);
+
+    // 1. Generate ability scores [str,dex,con,int,wis,cha]
+    const raw = NameHasher.genStats(rng);
+    [this.str,this.dex,this.con,this.int,this.wis,this.cha] = raw;
+
+    // 2. Modifiers
+    this.strMod=mod(this.str); this.dexMod=mod(this.dex); this.conMod=mod(this.con);
+    this.intMod=mod(this.int); this.wisMod=mod(this.wis); this.chaMod=mod(this.cha);
+
+    // 3. Assign class
+    this.classKey = assignClass(raw, rng);
+    this.classDef  = CLASSES[this.classKey];
+    this.className = this.classDef.name;
+
+    // 4. Core stats
+    this.level = 5;
+    this.proficiencyBonus = 3; // level 5
+    const primaryMod = this[this.classDef.attackStat+'Mod'];
+    this.attackBonus  = this.proficiencyBonus + primaryMod;
+    this.spellSaveDC  = this.classDef.isCaster
+      ? 8 + this.proficiencyBonus + this[this.classDef.saveDCStat+'Mod']
+      : 0;
+
+    // AC
+    let ac = this.classDef.acBase;
+    if (this.classDef.acUseDex)  ac += Math.min(this.dexMod, this.classDef.acDexCap ?? 99);
+    if (this.classDef.acUseCon)  ac += this.conMod;
+    if (this.classDef.acUseWis)  ac += this.wisMod;
+    this.ac = Math.max(10, ac);
+
+    // HP: average hit die * level + CON*level
+    const avgDie = Math.floor(this.classDef.hitDie / 2) + 1;
+    this.maxHP = avgDie * this.level + this.conMod * this.level;
+    this.maxHP = Math.max(10, this.maxHP);
+
+    // Damage die
+    this.damageDie = this.classDef.damageDie;
+    this.damageBonus = this[this.classDef.attackStat+'Mod'];
+
+    // Initiative
+    this.initiative = this.dexMod;
+
+    // 5. Skills — deep copy to allow per-instance uses tracking
+    this.skills = deepCopySkills(this.classDef.skills);
+
+    // 6. Title
+    const adjList  = this.classDef.titleAdj[currentLang]||this.classDef.titleAdj.en;
+    const nounList = this.classDef.titleNoun[currentLang]||this.classDef.titleNoun.en;
+    const ti = Math.floor(rng()*adjList.length);
+    const tn = Math.floor(rng()*nounList.length);
+    this.title = currentLang==='zh'
+      ? `"${adjList[ti]}${nounList[tn]}"`
+      : `"The ${adjList[ti]} ${nounList[tn]}"`;
+
+    // 7. Combat state (reset before each fight)
+    this.resetCombat();
+
+    // 8. Apply passive onInit effects
+    for (const sk of this.skills) {
+      if (sk.trigger==='passive' && sk.onInit) sk.onInit(this);
+    }
+    // Special per-class init
+    if (this.classKey==='paladin')  this._smiteUses=4;
+    if (this.classKey==='wizard')   { this._shieldCharges=2; this._fireball_used=false; }
+    if (this.classKey==='monk')     this._ki=5;
+    if (this.classKey==='warlock')  this._agathysDone=false;
+    if (this.classKey==='bard')     this._cwCharges=3;
+    if (this.classKey==='sorcerer') { this._twinReady=true; this._twinUsed=false; }
+  }
+
+  resetCombat() {
+    this.currentHP = this.maxHP;
+    this.tempHP    = 0;
+    this.conditions = new Map();
+    this.saveBonus  = 0;
+    this._sneakUsed = false;
+    this._dodgeUsed = false;
+    this._colossusUsed = false;
+    this._shieldUsed  = false;
+    this._shieldActive = false;
+    this.round = 0;
+  }
+
+  startOfTurn() {
+    this._sneakUsed    = false;
+    this._dodgeUsed    = false;
+    this._colossusUsed = false;
+    this._shieldUsed   = false;
+    if (this._shieldActive) { this.ac -= 5; this._shieldActive = false; }
+    // Tick down conditions
+    for (const [k,v] of this.conditions) {
+      if (v && typeof v.rounds === 'number') {
+        v.rounds--;
+        if (v.rounds <= 0) this.conditions.delete(k);
+      }
+    }
+  }
+
+  get isAlive() { return this.currentHP > 0; }
+  get hpPct()   { return this.currentHP / this.maxHP; }
+}
+
+function mod(score) { return Math.floor((score - 10) / 2); }
+
+function deepCopySkills(skills) {
+  return skills.map(sk => Object.assign({}, sk, {
+    _usesLeft: sk.uses === Infinity ? Infinity : sk.uses
+  }));
+}
+
+function assignClass(raw, rng) {
+  const [str,dex,con,int_,wis,cha] = raw;
+  const top = Math.max(...raw);
+  // Determine primary stat
+  if (str === top) {
+    const second = [dex,con,int_,wis,cha].reduce((a,b)=>a>b?a:b);
+    if (cha >= second - 1) return 'paladin';
+    if (con >= second - 1 && str >= 14) return 'barbarian';
+    return 'fighter';
+  }
+  if (dex === top) {
+    if (wis >= dex - 2 && wis >= 13) return rng() < 0.5 ? 'monk' : 'ranger';
+    return 'rogue';
+  }
+  if (con === top) return 'fighter';
+  if (int_ === top) return 'wizard';
+  if (wis === top) {
+    if (str >= wis - 2 || con >= wis - 2) return 'cleric';
+    return rng() < 0.5 ? 'cleric' : 'druid';
+  }
+  if (cha === top) {
+    if (int_ >= cha - 2) return 'warlock';
+    if (wis >= cha - 2) return 'bard';
+    return rng() < 0.5 ? 'sorcerer' : 'bard';
+  }
+  return 'fighter'; // fallback
+}
+
+/* =====================================================================
+   COMBAT ENGINE — D&D simplified combat resolution
+   ===================================================================== */
+class CombatEngine {
+  constructor(char1, char2) {
+    this.char1 = char1;
+    this.char2 = char2;
+    const seed = NameHasher.hash(char1.name + '|vs|' + char2.name);
+    this.rng   = NameHasher.seededRNG(seed);
+    this.events = []; // full combat log
+    this.round  = 0;
+    this.extraAttackThisTurn = false;
+  }
+
+  rollD(count, sides) {
+    let t = 0;
+    for (let i = 0; i < count; i++) t += Math.floor(this.rng() * sides) + 1;
+    return t;
+  }
+
+  rollD20(advantage=false, disadvantage=false) {
+    const r1 = Math.floor(this.rng() * 20) + 1;
+    if (!advantage && !disadvantage) return r1;
+    const r2 = Math.floor(this.rng() * 20) + 1;
+    return advantage ? Math.max(r1,r2) : Math.min(r1,r2);
+  }
+
+  log(event) { this.events.push(event); }
+
+  // Resolve a full attack roll
+  attackRoll(attacker, defender) {
+    const hasAdv  = attacker.conditions.has('raging') || attacker.classKey==='barbarian';
+    const hasDisadv = defender.conditions.has('dodging');
+    const advantage    = hasAdv && !hasDisadv;
+    const disadvantage = hasDisadv && !hasAdv;
+    const isMocked = attacker.conditions.has('mocked');
+
+    const rawRoll = this.rollD20(advantage && !isMocked, disadvantage || isMocked);
+    const total   = rawRoll + attacker.attackBonus;
+    const crit    = rawRoll === 20;
+    const fumble  = rawRoll === 1;
+    const targetAC = defender.ac;
+    const hit  = !fumble && (crit || total >= targetAC);
+
+    // Shield reaction
+    if (!hit && !fumble) {
+      const shSk = defender.skills.find(s=>s.id==='shield_spell');
+      if (shSk && shSk.onAttacked && shSk._usesLeft > 0) {
+        shSk.onAttacked(defender, this);
+        shSk._usesLeft--;
+      }
+    }
+    // Cutting Words
+    const cwSk = defender.skills.find(s=>s.id==='cutting_words');
+    let cwMod = 0;
+    if (cwSk && cwSk.onAttacked && cwSk._usesLeft > 0) {
+      cwMod = cwSk.onAttacked(defender, this, total);
+      if (cwMod < 0) cwSk._usesLeft--;
+    }
+
+    return { roll:rawRoll, total:total+cwMod, crit, fumble, hit: !fumble && (crit || (total+cwMod)>=targetAC), advantage, disadvantage };
+  }
+
+  // Spell attack roll (uses spellAttack bonus = proficiency + casting stat)
+  spellAttackRoll(attacker, defender) {
+    const spellBonus = attacker.proficiencyBonus + (attacker[attacker.classDef.attackStat+'Mod'] || 0);
+    const rawRoll = this.rollD20();
+    const total   = rawRoll + spellBonus;
+    const crit    = rawRoll === 20;
+    const hit     = crit || total >= defender.ac;
+    return { roll:rawRoll, total, crit, hit };
+  }
+
+  // Saving throw
+  savingThrow(creature, ability, dc) {
+    const statMod = creature[ability+'Mod'] || 0;
+    const bonus   = statMod + (creature.saveBonus||0);
+    const raw     = this.rollD20();
+    // Check for advantage from skills
+    let advSave = false;
+    for (const sk of creature.skills) {
+      if (sk.trigger==='passive' && sk.onSave) {
+        const r = sk.onSave(creature, ability);
+        if (r && r.advantage) { advSave=true; break; }
+      }
+    }
+    const roll = advSave ? Math.max(raw, this.rollD20()) : raw;
+    return (roll + bonus) >= dc;
+  }
+
+  // Damage roll for a standard attack
+  damageRoll(attacker, defender, crit=false, dmgType='slashing') {
+    let dice = crit ? this.rollD(2, attacker.damageDie) : this.rollD(1, attacker.damageDie);
+    let bonus = attacker.damageBonus;
+
+    // Rage damage bonus
+    if (attacker.conditions.has('raging')) {
+      bonus += attacker.conditions.get('raging').damageBonus || 0;
+    }
+
+    // Hunter's Mark bonus die
+    if (attacker.conditions.has('hunters_mark')) {
+      const hm = attacker.conditions.get('hunters_mark');
+      dice += this.rollD(...hm.bonusDie);
+    }
+
+    // Hex bonus die
+    if (attacker.conditions.has('hex_active')) {
+      const hx = attacker.conditions.get('hex_active');
+      dice += this.rollD(...hx.bonusDie);
+    }
+
+    // onHit passive skills (Sneak Attack, Divine Smite, Colossus Slayer, etc.)
+    for (const sk of attacker.skills) {
+      if (sk.trigger==='passive' && sk.onHit) {
+        const extra = sk.onHit(attacker, defender, this);
+        if (extra) dice += extra;
+      }
+    }
+
+    let total = Math.max(1, dice + bonus);
+
+    // Resistance (Barbarian Rage)
+    if (attacker.conditions.has('raging') && ['slashing','piercing','bludgeoning'].includes(dmgType)) {
+      // attacker rages — no resistance to self damage
+    }
+    if (defender.conditions.has('raging')) {
+      const rageData = defender.conditions.get('raging');
+      if (rageData.resist && rageData.resist.includes(dmgType)) total = Math.floor(total / 2);
+    }
+
+    return total;
+  }
+
+  // Apply damage to a creature (handles tempHP, Uncanny Dodge)
+  applyDamage(target, amount, source) {
+    // Uncanny Dodge
+    const ud = target.skills.find(s=>s.id==='uncanny_dodge');
+    if (ud && ud.onDamaged && ud._usesLeft > 0) {
+      amount = ud.onDamaged(target, amount);
+      ud._usesLeft--;
+    }
+    // Agathys reflect
+    if (target.conditions.has('agathys') && source) {
+      // close-range attack → reflect
+      const ag = target.conditions.get('agathys');
+      // (reflection logged separately in renderer)
+    }
+    // Temp HP absorbs first
+    if (target.tempHP > 0) {
+      const absorbed = Math.min(target.tempHP, amount);
+      target.tempHP -= absorbed;
+      amount -= absorbed;
+    }
+    target.currentHP = Math.max(0, target.currentHP - amount);
+  }
+
+  // Warlock Eldritch Blast — 2 beams
+  eldritchBlast(attacker, defender) {
+    let total = 0;
+    for (let b = 0; b < 2; b++) {
+      const roll = this.spellAttackRoll(attacker, defender);
+      if (roll.hit) {
+        const dmg = this.rollD(1,10) + attacker.chaMod;
+        total += dmg;
+        if (attacker.conditions.has('hex_active')) total += this.rollD(1,6);
+        this.log({type:'beam',actor:attacker.name,target:defender.name,data:{beam:b+1,roll:roll.total,hit:true,dmg,crit:roll.crit,dmgType:'force'}});
+        this.applyDamage(defender, dmg, attacker);
+      } else {
+        this.log({type:'beam',actor:attacker.name,target:defender.name,data:{beam:b+1,roll:roll.total,hit:false}});
+      }
+    }
+    return total;
+  }
+
+  // Standard attack sequence (1 or 2 attacks)
+  doAttacks(attacker, defender) {
+    const attacks = 1 + (attacker.classDef.extraAttacks||0) + (this.extraAttackThisTurn ? 1 : 0);
+    this.extraAttackThisTurn = false;
+    let totalDmg = 0;
+    for (let a = 0; a < attacks; a++) {
+      if (!defender.isAlive) break;
+      const roll = this.attackRoll(attacker, defender);
+      if (roll.hit) {
+        const dmgType = attacker.classKey==='ranger' ? 'piercing' :
+                        attacker.classKey==='monk'   ? 'bludgeoning' : 'slashing';
+        const dmg = this.damageRoll(attacker, defender, roll.crit, dmgType);
+        this.log({type:'attack',actor:attacker.name,target:defender.name,
+          data:{roll:roll.roll,total:roll.total,ac:defender.ac,hit:true,crit:roll.crit,
+                dmg,dmgType,advantage:roll.advantage}});
+        this.applyDamage(defender, dmg, attacker);
+        totalDmg += dmg;
+      } else {
+        this.log({type:'attack',actor:attacker.name,target:defender.name,
+          data:{roll:roll.roll,total:roll.total,ac:defender.ac,hit:false,fumble:roll.fumble}});
+      }
+    }
+    return totalDmg;
+  }
+
+  // Start-of-turn DoT effects (Spirit Guardians, Call Lightning)
+  processStartOfTurn(active, target) {
+    if (target.conditions.has('sg_active')) {
+      const sg = target.conditions.get('sg_active');
+      const dmg = this.rollD(...sg.dmgDice);
+      const saved = this.savingThrow(active, sg.saveType, sg.dc);
+      const final = saved ? Math.floor(dmg/2) : dmg;
+      if (final > 0) this.applyDamage(active, final, target);
+      this.log({type:'dot',actor:target.name,target:active.name,data:{effect:'Spirit Guardians',dmg:final,saved,dmgType:'radiant'}});
+    }
+    if (active.conditions.has('lightning_active')) {
+      const cl = active.conditions.get('lightning_active');
+      if (cl.turns > 0) {
+        cl.turns--;
+        const dmg = this.rollD(...cl.dmgDice);
+        const saved = this.savingThrow(target, cl.saveType, cl.dc);
+        const final = saved ? Math.floor(dmg/2) : dmg;
+        if (final > 0) this.applyDamage(target, final, active);
+        this.log({type:'dot',actor:active.name,target:target.name,data:{effect:'Call Lightning',dmg:final,saved,dmgType:'lightning'}});
+      }
+    }
+    // Stun check
+    if (active.conditions.has('stunned')) {
+      this.log({type:'stun',actor:active.name,data:{effect:'Stunned — loses turn'}});
+      return true; // skip turn
+    }
+    return false;
+  }
+
+  // AI: choose best action for this turn
+  chooseAndAct(active, opponent) {
+    active.round = this.round;
+    const ctx = { self:active, target:opponent, round:this.round };
+
+    // --- Bonus action first (buffs, heals) ---
+    for (const sk of active.skills) {
+      if (sk.trigger!=='active' || sk.timing!=='bonus') continue;
+      if (sk._usesLeft <= 0) continue;
+      if (sk.condition && !sk.condition(ctx)) continue;
+      sk._usesLeft = sk.uses===Infinity ? Infinity : sk._usesLeft-1;
+      sk.effect(active, opponent, this);
+    }
+
+    // --- Main action ---
+    // Priority-sorted active action skills
+    const actionSkills = active.skills
+      .filter(sk=>sk.trigger==='active' && sk.timing==='action' && sk._usesLeft>0 && (!sk.condition||sk.condition(ctx)))
+      .sort((a,b)=>(b.priority||0)-(a.priority||0));
+
+    if (actionSkills.length > 0) {
+      const sk = actionSkills[0];
+      sk._usesLeft = sk.uses===Infinity ? Infinity : sk._usesLeft-1;
+      sk.effect(active, opponent, this);
+    } else {
+      // Default: weapon attacks (or Eldritch Blast for warlock)
+      if (active.classKey==='warlock') {
+        this.eldritchBlast(active, opponent);
+      } else {
+        this.doAttacks(active, opponent);
+      }
+    }
+  }
+
+  // Run the full battle and return events array
+  fight() {
+    const { char1, char2 } = this;
+    char1.resetCombat(); char2.resetCombat();
+    // Re-apply passive onInits after reset
+    for (const c of [char1, char2]) {
+      for (const sk of c.skills) {
+        if (sk.trigger==='passive' && sk.onInit) sk.onInit(c);
+      }
+      if (c.classKey==='paladin')  c._smiteUses=4;
+      if (c.classKey==='wizard')   { c._shieldCharges=2; c._fireball_used=false; }
+      if (c.classKey==='monk')     c._ki=5;
+      if (c.classKey==='warlock')  c._agathysDone=false;
+      if (c.classKey==='bard')     c._cwCharges=3;
+      if (c.classKey==='sorcerer') { c._twinReady=true; c._twinUsed=false; }
+    }
+    this.events = [];
+    this.round  = 0;
+
+    // Initiative
+    const init1 = this.rollD20() + char1.initiative;
+    const init2 = this.rollD20() + char2.initiative;
+    this.log({type:'initiative',data:{[char1.name]:init1,[char2.name]:init2}});
+    const order = init1 >= init2 ? [char1,char2] : [char2,char1];
+
+    // Combat loop — max 20 rounds
+    for (this.round = 1; this.round <= 20; this.round++) {
+      this.log({type:'round_start',data:{round:this.round}});
+      for (const active of order) {
+        const opponent = active === char1 ? char2 : char1;
+        if (!active.isAlive || !opponent.isAlive) break;
+        active.startOfTurn();
+        const skipTurn = this.processStartOfTurn(active, opponent);
+        if (!opponent.isAlive) break;
+        if (!skipTurn) this.chooseAndAct(active, opponent);
+        if (!opponent.isAlive) break;
+      }
+      if (!char1.isAlive || !char2.isAlive) break;
+    }
+
+    // Determine winner
+    let winner, loser;
+    if (!char1.isAlive && !char2.isAlive) {
+      winner = char1.hpPct >= char2.hpPct ? char1 : char2;
+      loser  = winner === char1 ? char2 : char1;
+    } else if (!char2.isAlive) {
+      winner = char1; loser = char2;
+    } else if (!char1.isAlive) {
+      winner = char2; loser = char1;
+    } else {
+      // Timeout
+      winner = char1.hpPct >= char2.hpPct ? char1 : char2;
+      loser  = winner === char1 ? char2 : char1;
+      this.log({type:'timeout',data:{winner:winner.name}});
+    }
+
+    this.log({type:'victory',data:{winner:winner.name,loser:loser.name,rounds:this.round}});
+    return { winner, loser, events:this.events, rounds:this.round };
+  }
+}
+
+/* =====================================================================
+   DAMAGE TYPE LABELS
+   ===================================================================== */
+const DMG_LABELS = {
+  zh: { slashing:'挥砍',piercing:'穿刺',bludgeoning:'钝击',fire:'火焰',cold:'寒冷',
+        lightning:'闪电',radiant:'辐射',necrotic:'黯蚀',force:'力场',
+        psychic:'精神',poison:'毒素',acid:'强酸',elemental:'元素',thunder:'雷鸣' },
+  en: { slashing:'slashing',piercing:'piercing',bludgeoning:'bludgeoning',
+        fire:'fire',cold:'cold',lightning:'lightning',radiant:'radiant',
+        necrotic:'necrotic',force:'force',psychic:'psychic',poison:'poison',
+        acid:'acid',elemental:'elemental',thunder:'thunder' }
+};
+function dmgLabel(type) {
+  return (DMG_LABELS[currentLang]||DMG_LABELS.en)[type] || type;
+}
+
+/* =====================================================================
+   STAT BLOCK RENDERER
+   ===================================================================== */
+function renderStatBlock(char, el) {
+  const cn = currentLang === 'zh';
+  const cls = cn ? char.classDef.name.zh : char.classDef.name.en;
+  el.innerHTML = `
+    <div class="stat-block-name">${char.name}</div>
+    <div class="stat-block-class">${cls} · Lv.${char.level} · ${char.classDef.icon}</div>
+    <div class="stat-block-title">${char.title}</div>
+    <hr class="stat-divider">
+    <div class="ability-scores">
+      ${['STR','DEX','CON','INT','WIS','CHA'].map((ab,i)=>{
+        const val = [char.str,char.dex,char.con,char.int,char.wis,char.cha][i];
+        const m   = [char.strMod,char.dexMod,char.conMod,char.intMod,char.wisMod,char.chaMod][i];
+        return `<div class="ability-box">
+          <span class="ab-label">${ab}</span>
+          <span class="ab-val">${val}</span>
+          <span class="ab-mod">${m>=0?'+'+m:m}</span>
+        </div>`;
+      }).join('')}
+    </div>
+    <hr class="stat-divider">
+    <div class="stat-line"><b>HP</b> ${char.maxHP} &nbsp; <b>AC</b> ${char.ac} &nbsp; <b>${cn?'先攻':'Init'}</b> ${char.initiative>=0?'+'+char.initiative:char.initiative}</div>
+    <div class="stat-line"><b>${cn?'攻击':'Atk'}</b> +${char.attackBonus} &nbsp; <b>${cn?'伤害':'Dmg'}</b> 1d${char.damageDie}${char.damageBonus>=0?'+'+char.damageBonus:char.damageBonus}${char.spellSaveDC?` &nbsp; <b>DC</b> ${char.spellSaveDC}`:''}</div>
+    <div class="stat-line"><b>${cn?'武器':'Wpn'}</b> ${cn?char.classDef.equipment.zh:char.classDef.equipment.en}</div>
+    <hr class="stat-divider">
+    <ul class="skill-list">
+      ${char.skills.map(sk=>`
+        <li>
+          <span class="skill-name">${cn?sk.name.zh:sk.name.en}</span>
+          <span class="skill-desc">${cn?sk.desc.zh:sk.desc.en}</span>
+        </li>`).join('')}
+    </ul>`;
+}
+
+function renderFullSheet(char, container) {
+  const cn = currentLang === 'zh';
+  const cls  = cn ? char.classDef.name.zh : char.classDef.name.en;
+  const wpn  = cn ? char.classDef.equipment.zh : char.classDef.equipment.en;
+  const arm  = cn ? char.classDef.armor.zh    : char.classDef.armor.en;
+
+  const stats = [
+    {ab:'STR',val:char.str,m:char.strMod},
+    {ab:'DEX',val:char.dex,m:char.dexMod},
+    {ab:'CON',val:char.con,m:char.conMod},
+    {ab:'INT',val:char.int,m:char.intMod},
+    {ab:'WIS',val:char.wis,m:char.wisMod},
+    {ab:'CHA',val:char.cha,m:char.chaMod},
+  ];
+
+  container.innerHTML = `
+    <div class="char-sheet-card" id="sheet-card">
+      <div class="sheet-name">${char.name}</div>
+      <div class="sheet-class-line">${cls} · ${cn?'等级':'Level'} ${char.level} · ${char.classDef.icon}</div>
+      <div class="sheet-title-line">${char.title}</div>
+      <hr class="sheet-divider">
+      <div class="sheet-core-stats">
+        <span class="sheet-core-stat"><b>HP</b> ${char.maxHP}</span>
+        <span class="sheet-core-stat"><b>AC</b> ${char.ac}</span>
+        <span class="sheet-core-stat"><b>${cn?'先攻':'Init'}</b> ${char.initiative>=0?'+'+char.initiative:char.initiative}</span>
+        <span class="sheet-core-stat"><b>${cn?'攻击':'Atk'}</b> +${char.attackBonus}</span>
+        ${char.spellSaveDC?`<span class="sheet-core-stat"><b>DC</b> ${char.spellSaveDC}</span>`:''}
+      </div>
+      <hr class="sheet-divider">
+      <div class="sheet-ability-grid">
+        ${stats.map(s=>`
+          <div class="sheet-ability-box">
+            <span class="sa-label">${s.ab}</span>
+            <span class="sa-val">${s.val}</span>
+            <span class="sa-mod">${s.m>=0?'+'+s.m:s.m}</span>
+          </div>`).join('')}
+      </div>
+      <div class="sheet-stat-bars">
+        ${stats.map(s=>`
+          <div class="sheet-stat-bar-row">
+            <span class="bar-label">${s.ab}</span>
+            <div class="bar-track"><div class="bar-fill" style="width:${Math.round((s.val/20)*100)}%"></div></div>
+            <span class="bar-num">${s.val}</span>
+          </div>`).join('')}
+      </div>
+      <hr class="sheet-divider">
+      <div class="sheet-equip-line"><b>${cn?'武器':'Weapon'}</b> ${wpn}</div>
+      <div class="sheet-equip-line"><b>${cn?'护甲':'Armor'}</b> ${arm}</div>
+      <hr class="sheet-divider">
+      <div style="font-family:var(--font-heading);font-size:0.75em;letter-spacing:0.1em;color:var(--heading);margin-bottom:6px;">${cn?'技能':'SKILLS'}</div>
+      <ul class="sheet-skills-list">
+        ${char.skills.map(sk=>`
+          <li>
+            <span class="sheet-skill-bullet">•</span>
+            <span class="sheet-skill-name">${cn?sk.name.zh:sk.name.en}</span>
+            <span class="sheet-skill-desc">${cn?sk.desc.zh:sk.desc.en}</span>
+          </li>`).join('')}
+      </ul>
+    </div>`;
+}
+
+/* =====================================================================
+   BATTLE RENDERER — async playback of pre-computed event log
+   ===================================================================== */
+const BattleRenderer = {
+  speed: 1,
+  playing: false,
+  skipRequested: false,
+
+  get delay() {
+    const base = { 1:750, 2:380, 4:180, 0:0 };
+    return base[this.speed] ?? 750;
+  },
+
+  async play(events, char1, char2, callbacks) {
+    this.playing = true;
+    this.skipRequested = false;
+    const log  = document.getElementById('combat-log');
+    log.innerHTML = '';
+
+    let currentRound = 0;
+
+    for (const ev of events) {
+      if (!this.playing) break;
+
+      if (ev.type === 'round_start') {
+        currentRound = ev.data.round;
+        if (callbacks.onRound) callbacks.onRound(currentRound);
+        this._addRoundHeader(log, currentRound);
+        continue;
+      }
+
+      const line = this._buildLine(ev, char1, char2);
+      if (line) {
+        if (this.skipRequested) {
+          // Instant mode: no animation delay
+          const el = this._appendEntry(log, line, true);
+        } else {
+          const el = this._appendEntry(log, line, false);
+          log.scrollTop = log.scrollHeight;
+
+          // Visual effects
+          if (ev.type==='attack' && ev.data.crit) this._triggerCrit();
+          if ((ev.type==='attack'||ev.type==='spell'||ev.type==='beam') && ev.data.hit && ev.data.dmg > 0) {
+            const side = ev.actor === char1.name ? 'right' : 'left';
+            this._floatDamage(ev.data.dmg||ev.data.final||0, side, ev.data.dmgType);
+          }
+          if (ev.type === 'heal') {
+            const side = ev.actor === char1.name ? 'left' : 'right';
+            this._floatHeal(ev.data.amount, side);
+          }
+
+          await this._sleep(this.delay);
+        }
+      }
+
+      // HP update after each event
+      if (callbacks.onHP) callbacks.onHP(char1, char2);
+
+      // Death check
+      if ((ev.type==='attack'||ev.type==='spell'||ev.type==='beam'||ev.type==='dot') && callbacks.onHP) {
+        callbacks.onHP(char1, char2);
+      }
+    }
+
+    log.scrollTop = log.scrollHeight;
+    this.playing = false;
+  },
+
+  _addRoundHeader(log, round) {
+    const h = document.createElement('div');
+    h.className = 'log-round-header';
+    h.textContent = currentLang==='zh' ? `第 ${round} 回合` : `Round ${round}`;
+    log.appendChild(h);
+  },
+
+  _appendEntry(log, html, instant) {
+    const el = document.createElement('div');
+    el.className = 'log-entry';
+    el.innerHTML = html;
+    if (instant) el.style.cssText = 'opacity:1;transform:none;animation:none;';
+    log.appendChild(el);
+    return el;
+  },
+
+  _buildLine(ev, char1, char2) {
+    const cn = currentLang==='zh';
+    const d  = ev.data || {};
+
+    switch (ev.type) {
+      case 'initiative': {
+        const n1=char1.name, n2=char2.name;
+        const i1=d[n1], i2=d[n2];
+        const first = i1>=i2 ? n1 : n2;
+        return cn
+          ? `<span class="narr">先攻掷骰 — ${n1}: <span class="dice">${i1}</span>，${n2}: <span class="dice">${i2}</span>。${first} 先手！</span>`
+          : `<span class="narr">Initiative — ${n1}: <span class="dice">${i1}</span>, ${n2}: <span class="dice">${i2}</span>. ${first} goes first!</span>`;
+      }
+      case 'attack': {
+        if (d.hit) {
+          const critStr = d.crit ? `<span class="crit"> ${cn?'暴击！！':'CRITICAL HIT!!'}</span>` : '';
+          return cn
+            ? `${ev.actor} ${cn?'攻击':'attacks'} ${ev.target}：<span class="dice">[${d.roll}]</span>+${char1.name===ev.actor?char1.attackBonus:char2.attackBonus} = ${d.total} 对抗 AC ${d.ac}${critStr} — <span class="dmg">${d.dmg} 点${dmgLabel(d.dmgType||'slashing')}伤害</span>`
+            : `${ev.actor} attacks ${ev.target}: <span class="dice">[${d.roll}]</span>+${char1.name===ev.actor?char1.attackBonus:char2.attackBonus} = ${d.total} vs AC ${d.ac}${critStr} — <span class="dmg">${d.dmg} ${dmgLabel(d.dmgType||'slashing')} dmg</span>`;
+        } else {
+          const fumbleStr = d.fumble ? (cn?' <span class="miss">（大失败！）</span>':' <span class="miss">(fumble!)</span>') : '';
+          return cn
+            ? `<span class="miss">${ev.actor} 攻击 ${ev.target}：<span class="dice">[${d.roll}]</span>+${char1.name===ev.actor?char1.attackBonus:char2.attackBonus} = ${d.total} 对抗 AC ${d.ac} — 未命中${fumbleStr}</span>`
+            : `<span class="miss">${ev.actor} attacks ${ev.target}: <span class="dice">[${d.roll}]</span> = ${d.total} vs AC ${d.ac} — Miss!${fumbleStr}</span>`;
+        }
+      }
+      case 'spell': {
+        const spellName = `<span class="skill">${d.spell}</span>`;
+        if (d.autoHit) {
+          return cn
+            ? `${ev.actor} 释放 ${spellName}（自动命中）— <span class="dmg">${d.final} 点${dmgLabel(d.dmgType)}伤害</span>`
+            : `${ev.actor} casts ${spellName} (auto-hit) — <span class="dmg">${d.final} ${dmgLabel(d.dmgType)} dmg</span>`;
+        }
+        if (d.hit !== undefined) {
+          // Spell attack roll
+          return d.hit
+            ? (cn ? `${ev.actor} 释放 ${spellName}：命中！<span class="dmg">${d.final} 点${dmgLabel(d.dmgType)}伤害</span>${d.crit?'<span class="crit"> 暴击！</span>':''}` : `${ev.actor} casts ${spellName}: Hit! <span class="dmg">${d.final} ${dmgLabel(d.dmgType)} dmg</span>${d.crit?' <span class="crit">CRIT!</span>':''}`)
+            : `<span class="miss">${ev.actor} ${cn?'释放':'casts'} ${spellName} — ${cn?'未命中':'Miss!'}</span>`;
+        }
+        // Saving throw spell
+        const saveStr = d.saved
+          ? `<span class="save">${cn?'豁免成功（减半）':'Save! (half dmg)'}</span>`
+          : `<span class="miss">${cn?'豁免失败':'Failed save'}</span>`;
+        if (d.final === 0) {
+          return cn
+            ? `${ev.actor} 释放 ${spellName} — ${ev.target} ${saveStr}，完全闪避！`
+            : `${ev.actor} casts ${spellName} — ${ev.target} ${saveStr}, evades!`;
+        }
+        return cn
+          ? `${ev.actor} 释放 ${spellName} — ${ev.target} ${saveStr}：<span class="dmg">${d.final} 点${dmgLabel(d.dmgType)}伤害</span>`
+          : `${ev.actor} casts ${spellName} — ${ev.target} ${saveStr}: <span class="dmg">${d.final} ${dmgLabel(d.dmgType)} dmg</span>`;
+      }
+      case 'beam':
+        return d.hit
+          ? (cn ? `${ev.actor} 魔能爆 第${d.beam}束：命中！<span class="dmg">${d.dmg} 点力场伤害</span>${d.crit?'<span class="crit"> 暴击！</span>':''}` : `${ev.actor} Eldritch Blast beam ${d.beam}: Hit! <span class="dmg">${d.dmg} force dmg</span>${d.crit?' <span class="crit">CRIT!</span>':''}`)
+          : `<span class="miss">${ev.actor} ${cn?'魔能爆 第':'EB beam '}${d.beam}${cn?'束：未命中':': Miss!'}</span>`;
+
+      case 'heal':
+        return cn
+          ? `${ev.actor} 使用 <span class="skill">${d.skill}</span> — <span class="heal">恢复 ${d.amount} 点生命</span>`
+          : `${ev.actor} uses <span class="skill">${d.skill}</span> — <span class="heal">+${d.amount} HP</span>`;
+
+      case 'skill':
+        return cn
+          ? `${ev.actor} 使用 <span class="skill">${d.skill||'技能'}</span>！`
+          : `${ev.actor} uses <span class="skill">${d.skill||'skill'}</span>!`;
+
+      case 'condition':
+        return cn
+          ? `${ev.actor} 施加 <span class="skill">${d.effect}</span> 于 ${ev.target}：${d.saved?'<span class="save">豁免成功</span>':'<span class="miss">豁免失败</span>'}`
+          : `${ev.actor} applies <span class="skill">${d.effect}</span> on ${ev.target}: ${d.saved?'<span class="save">Saved</span>':'<span class="miss">Failed</span>'}`;
+
+      case 'dot':
+        return cn
+          ? `<span class="skill">${d.effect}</span> — ${ev.target} 受到 <span class="dmg">${d.dmg} 点${dmgLabel(d.dmgType)}伤害</span>${d.saved?' <span class="save">（豁免减半）</span>':''}`
+          : `<span class="skill">${d.effect}</span> — ${ev.target} takes <span class="dmg">${d.dmg} ${dmgLabel(d.dmgType)} dmg</span>${d.saved?' <span class="save">(half)</span>':''}`;
+
+      case 'stun':
+        return cn
+          ? `<span class="miss">${ev.actor} 陷入昏迷，失去本回合行动！</span>`
+          : `<span class="miss">${ev.actor} is stunned — loses turn!</span>`;
+
+      case 'timeout':
+        return cn
+          ? `<span class="narr">⏱ 超时判定 — 剩余HP百分比较高者获胜</span>`
+          : `<span class="narr">⏱ Time limit reached — higher HP% wins</span>`;
+
+      case 'victory': {
+        const winnerChar = d.winner===char1.name ? char1 : char2;
+        const cls = currentLang==='zh' ? winnerChar.classDef.name.zh : winnerChar.classDef.name.en;
+        return cn
+          ? `<span class="crit">⚔ ${d.winner}（${cls}）获胜！共 ${d.rounds} 回合。</span>`
+          : `<span class="crit">⚔ ${d.winner} (${cls}) wins! ${d.rounds} rounds.</span>`;
+      }
+
+      default: return null;
+    }
+  },
+
+  _triggerCrit() {
+    const el = document.getElementById('crit-flash');
+    el.classList.remove('flash');
+    void el.offsetWidth;
+    el.classList.add('flash');
+    document.getElementById('app').classList.remove('shake');
+    void document.getElementById('app').offsetWidth;
+    document.getElementById('app').classList.add('shake');
+  },
+
+  _floatDamage(amount, side, dmgType) {
+    if (!amount) return;
+    const colors = {
+      fire:'#e05020',cold:'#4090d0',lightning:'#c0c000',radiant:'#e0a020',
+      force:'#a0a0ff',psychic:'#b060c0',necrotic:'#606020',slashing:'var(--red)',
+      piercing:'var(--red)',bludgeoning:'var(--red)',elemental:'#e07820',default:'var(--red)'
+    };
+    const col = colors[dmgType] || colors.default;
+    const bars = document.querySelector('.hp-bars-section');
+    if (!bars) return;
+    const rect = bars.getBoundingClientRect();
+    const el = document.createElement('div');
+    el.className = 'float-num';
+    el.textContent = '-' + amount;
+    el.style.color = col;
+    el.style.left = (side==='left' ? rect.left+30 : rect.right-60) + 'px';
+    el.style.top  = (rect.top + window.scrollY - 10) + 'px';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 1200);
+  },
+
+  _floatHeal(amount, side) {
+    if (!amount) return;
+    const bars = document.querySelector('.hp-bars-section');
+    if (!bars) return;
+    const rect = bars.getBoundingClientRect();
+    const el = document.createElement('div');
+    el.className = 'float-num';
+    el.textContent = '+' + amount;
+    el.style.color = 'var(--green)';
+    el.style.left = (side==='left' ? rect.left+30 : rect.right-60) + 'px';
+    el.style.top  = (rect.top + window.scrollY - 10) + 'px';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 1200);
+  },
+
+  _sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  },
+
+  skip() { this.skipRequested = true; this.speed = 0; }
+};
+
+/* =====================================================================
+   HP BAR UPDATER
+   ===================================================================== */
+function updateHPBars(char1, char2) {
+  _updateBar('hp1-fill','hp1-text', char1);
+  _updateBar('hp2-fill','hp2-text', char2);
+}
+function _updateBar(fillId, textId, char) {
+  const fill = document.getElementById(fillId);
+  const text = document.getElementById(textId);
+  if (!fill || !text) return;
+  const pct = Math.max(0, char.currentHP / char.maxHP);
+  fill.style.width = Math.round(pct*100) + '%';
+  text.textContent = `${Math.max(0,char.currentHP)} / ${char.maxHP} HP`;
+  const tier = pct > 0.6 ? 'high' : pct > 0.3 ? 'medium' : pct > 0.1 ? 'low' : 'critical';
+  fill.setAttribute('data-pct', tier);
+}
+
+/* =====================================================================
+   THEME & MODE SYSTEM
+   ===================================================================== */
+const ThemeManager = {
+  current: localStorage.getItem('arena_theme') || 'phb',
+  mode:    localStorage.getItem('arena_mode')  || 'light',
+
+  apply(theme, mode) {
+    if (theme) this.current = theme;
+    if (mode)  this.mode    = mode;
+
+    const html = document.documentElement;
+    html.setAttribute('data-theme', this.current);
+
+    let m = this.mode;
+    if (m === 'system') m = window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
+    html.setAttribute('data-mode', m);
+
+    localStorage.setItem('arena_theme', this.current);
+    localStorage.setItem('arena_mode',  this.mode);
+
+    // Update settings button states
+    document.querySelectorAll('[data-theme-btn]').forEach(b => {
+      b.classList.toggle('active', b.dataset.themeBtn === this.current);
+    });
+    document.querySelectorAll('[data-mode-btn]').forEach(b => {
+      b.classList.toggle('active', b.dataset.modeBtn === this.mode);
+    });
+  }
+};
+
+/* =====================================================================
+   TOAST
+   ===================================================================== */
+function showToast(msg, duration=2000) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), duration);
+}
+
+/* =====================================================================
+   GAME UI CONTROLLER
+   ===================================================================== */
+const GameUI = {
+  char1: null,
+  char2: null,
+  battleResult: null,
+
+  init() {
+    // Fade in
+    document.documentElement.style.opacity = '1';
+
+    // Apply saved theme
+    ThemeManager.apply();
+
+    // Apply saved language
+    currentLang = localStorage.getItem('arena_lang') || 'zh';
+    this.applyI18n();
+
+    // Navigation
+    document.getElementById('btn-duel').addEventListener('click', ()=>this.showView('duel'));
+    document.getElementById('btn-sheet').addEventListener('click', ()=>this.showView('sheet'));
+    document.getElementById('duel-back').addEventListener('click', ()=>this.showView('landing'));
+    document.getElementById('sheet-back').addEventListener('click', ()=>this.showView('landing'));
+
+    // Language toggle
+    document.getElementById('lang-toggle').addEventListener('click', ()=>{
+      currentLang = currentLang==='zh' ? 'en' : 'zh';
+      localStorage.setItem('arena_lang', currentLang);
+      document.getElementById('lang-toggle').textContent = currentLang==='zh' ? 'EN' : '中';
+      this.applyI18n();
+      // Re-render if chars exist
+      if (this.char1) renderStatBlock(this.char1, document.getElementById('stat-block-1'));
+      if (this.char2) renderStatBlock(this.char2, document.getElementById('stat-block-2'));
+    });
+
+    // Settings toggle
+    document.getElementById('settings-toggle').addEventListener('click', (e)=>{
+      e.stopPropagation();
+      document.getElementById('settings-panel').classList.toggle('open');
+    });
+    document.addEventListener('click', ()=>{
+      document.getElementById('settings-panel').classList.remove('open');
+    });
+    document.getElementById('settings-panel').addEventListener('click', e=>e.stopPropagation());
+
+    // Theme/mode buttons
+    document.querySelectorAll('[data-theme-btn]').forEach(btn => {
+      btn.addEventListener('click', ()=>ThemeManager.apply(btn.dataset.themeBtn, null));
+    });
+    document.querySelectorAll('[data-mode-btn]').forEach(btn => {
+      btn.addEventListener('click', ()=>ThemeManager.apply(null, btn.dataset.modeBtn));
+    });
+
+    // Fight button
+    document.getElementById('btn-fight').addEventListener('click', ()=>this.startDuel());
+
+    // Rematch
+    document.getElementById('btn-rematch').addEventListener('click', ()=>this.startDuel());
+
+    // Copy result
+    document.getElementById('btn-copy-result').addEventListener('click', ()=>this.copyResult());
+
+    // Speed controls
+    document.querySelectorAll('.speed-btn').forEach(btn => {
+      btn.addEventListener('click', ()=>{
+        const sp = parseInt(btn.dataset.speed);
+        BattleRenderer.speed = sp;
+        if (sp === 0) BattleRenderer.skip();
+        document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // Enter key on name inputs
+    document.getElementById('name1').addEventListener('keydown', e=>{ if(e.key==='Enter') this.startDuel(); });
+    document.getElementById('name2').addEventListener('keydown', e=>{ if(e.key==='Enter') this.startDuel(); });
+
+    // Character sheet
+    document.getElementById('btn-generate-sheet').addEventListener('click', ()=>this.generateSheet());
+    document.getElementById('sheet-name').addEventListener('keydown', e=>{ if(e.key==='Enter') this.generateSheet(); });
+    document.getElementById('btn-copy-sheet').addEventListener('click', ()=>this.copySheet());
+
+    // URL hash routing
+    this.handleHash();
+
+    // Init settings button states
+    ThemeManager.apply();
+    document.getElementById('lang-toggle').textContent = currentLang==='zh' ? 'EN' : '中';
+  },
+
+  showView(name) {
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+name).classList.add('active');
+  },
+
+  applyI18n() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      const val = t(key);
+      if (val !== key) el.textContent = val;
+    });
+  },
+
+  async startDuel() {
+    const n1 = document.getElementById('name1').value.trim();
+    const n2 = document.getElementById('name2').value.trim();
+    if (!n1 || !n2) {
+      showToast(currentLang==='zh' ? '请输入两个名字' : 'Enter two names');
+      return;
+    }
+
+    // Generate characters
+    this.char1 = new Character(n1);
+    this.char2 = new Character(n2);
+
+    // Show stat blocks
+    const grid = document.getElementById('char-grid');
+    grid.style.display = 'grid';
+    renderStatBlock(this.char1, document.getElementById('stat-block-1'));
+    renderStatBlock(this.char2, document.getElementById('stat-block-2'));
+
+    // Show HP bars
+    const hpSection = document.getElementById('hp-bars');
+    hpSection.style.display = 'block';
+    document.getElementById('hp1-name').textContent = this.char1.name;
+    document.getElementById('hp2-name').textContent = this.char2.name;
+    updateHPBars(this.char1, this.char2);
+
+    // Show combat section
+    document.getElementById('combat-section').style.display = 'block';
+    document.getElementById('result-banner').classList.remove('visible');
+    document.getElementById('combat-log').innerHTML =
+      `<div class="empty-state"><div class="empty-icon">⚔</div>${currentLang==='zh'?'战斗开始中…':'Commencing battle…'}</div>`;
+
+    // Update URL hash
+    const enc = encodeURIComponent;
+    history.replaceState(null,'','#duel='+enc(n1)+','+enc(n2));
+
+    // Run combat engine (sync)
+    const engine = new CombatEngine(this.char1, this.char2);
+    this.battleResult = engine.fight();
+
+    // Reset speed button
+    document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelector('.speed-btn[data-speed="1"]').classList.add('active');
+    BattleRenderer.speed = 1;
+
+    // Play battle
+    await BattleRenderer.play(
+      this.battleResult.events,
+      this.char1, this.char2,
+      {
+        onRound: (r) => {
+          document.getElementById('round-label').textContent =
+            currentLang==='zh' ? `第 ${r} 回合` : `Round ${r}`;
+        },
+        onHP: (c1, c2) => updateHPBars(c1, c2),
+      }
+    );
+
+    // Final HP sync
+    updateHPBars(this.char1, this.char2);
+
+    // Show result
+    this.showResult(this.battleResult);
+  },
+
+  showResult(result) {
+    const banner = document.getElementById('result-banner');
+    const winner = result.winner;
+    const loser  = result.loser;
+    const wcls = currentLang==='zh' ? winner.classDef.name.zh : winner.classDef.name.en;
+    const lcls = currentLang==='zh' ? loser.classDef.name.zh  : loser.classDef.name.en;
+
+    document.getElementById('result-winner').textContent =
+      currentLang==='zh'
+        ? `${winner.name} 获胜！`
+        : `${winner.name} Wins!`;
+    document.getElementById('result-detail').textContent =
+      currentLang==='zh'
+        ? `${winner.name}（${wcls} Lv.5）击败了 ${loser.name}（${lcls} Lv.5）— ${result.rounds} 回合`
+        : `${winner.name} (${wcls} Lv.5) defeated ${loser.name} (${lcls} Lv.5) in ${result.rounds} rounds`;
+
+    banner.classList.add('visible');
+  },
+
+  copyResult() {
+    if (!this.battleResult) return;
+    const r = this.battleResult;
+    const w = r.winner, l = r.loser;
+    const wcls = currentLang==='zh' ? w.classDef.name.zh : w.classDef.name.en;
+    const lcls = currentLang==='zh' ? l.classDef.name.zh : l.classDef.name.en;
+    const text = currentLang==='zh'
+      ? `${w.name}（${wcls} Lv.5，HP${w.maxHP}/AC${w.ac}）击败了 ${l.name}（${lcls} Lv.5）历时 ${r.rounds} 回合！#名字竞技场 #NameArena`
+      : `${w.name} (${wcls} Lv.5, HP${w.maxHP}/AC${w.ac}) defeated ${l.name} (${lcls} Lv.5) in ${r.rounds} rounds! #NameArena`;
+    navigator.clipboard.writeText(text).then(()=>{
+      showToast(currentLang==='zh' ? '已复制到剪贴板！' : 'Copied to clipboard!');
+    });
+  },
+
+  generateSheet() {
+    const name = document.getElementById('sheet-name').value.trim();
+    if (!name) {
+      showToast(currentLang==='zh' ? '请输入名字' : 'Enter a name');
+      return;
+    }
+    const char = new Character(name);
+    const container = document.getElementById('sheet-output');
+    renderFullSheet(char, container);
+    document.getElementById('sheet-actions').style.display = 'flex';
+    this._lastSheetChar = char;
+
+    // Update URL
+    history.replaceState(null,'','#sheet='+encodeURIComponent(name));
+  },
+
+  copySheet() {
+    const c = this._lastSheetChar;
+    if (!c) return;
+    const cn  = currentLang==='zh';
+    const cls = cn ? c.classDef.name.zh : c.classDef.name.en;
+    const skills = c.skills.map(sk=>`• ${cn?sk.name.zh:sk.name.en}: ${cn?sk.desc.zh:sk.desc.en}`).join('\n');
+    const text = [
+      `${c.name} — ${cls} Lv.5 ${c.title}`,
+      `HP ${c.maxHP} | AC ${c.ac} | Init ${c.initiative>=0?'+'+c.initiative:c.initiative}`,
+      `STR${c.str} DEX${c.dex} CON${c.con} INT${c.int} WIS${c.wis} CHA${c.cha}`,
+      `Atk +${c.attackBonus} | Dmg 1d${c.damageDie}${c.damageBonus>=0?'+'+c.damageBonus:c.damageBonus}${c.spellSaveDC?` | DC${c.spellSaveDC}`:''}`,
+      '', skills,
+      '', '#名字竞技场 #NameArena'
+    ].join('\n');
+    navigator.clipboard.writeText(text).then(()=>{
+      showToast(cn ? '角色卡已复制！' : 'Character sheet copied!');
+    });
+  },
+
+  handleHash() {
+    const hash = location.hash.slice(1);
+    if (!hash) return;
+    const duelMatch = hash.match(/^duel=([^,]+),(.+)$/);
+    if (duelMatch) {
+      const n1 = decodeURIComponent(duelMatch[1]);
+      const n2 = decodeURIComponent(duelMatch[2]);
+      document.getElementById('name1').value = n1;
+      document.getElementById('name2').value = n2;
+      this.showView('duel');
+      setTimeout(()=>this.startDuel(), 300);
+      return;
+    }
+    const sheetMatch = hash.match(/^sheet=(.+)$/);
+    if (sheetMatch) {
+      const name = decodeURIComponent(sheetMatch[1]);
+      document.getElementById('sheet-name').value = name;
+      this.showView('sheet');
+      setTimeout(()=>this.generateSheet(), 100);
+    }
+  }
+};
+
+/* =====================================================================
+   BOOT
+   ===================================================================== */
+window.addEventListener('DOMContentLoaded', ()=>GameUI.init());
+</script>
+
+</body>
+</html>
