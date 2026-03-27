@@ -570,6 +570,69 @@ body {
   color: var(--text-faint);
   font-style: italic;
 }
+.stat-block-alignment { margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.alignment-badge {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-size: 0.68em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 1px 7px;
+  border-radius: 3px;
+  border: 1px solid currentColor;
+}
+/* Good tier: blue */
+.alignment-LG,.alignment-NG,.alignment-CG { color:#4a9eff; background:rgba(74,158,255,0.12); }
+/* Neutral tier: muted */
+.alignment-LN,.alignment-TN,.alignment-CN { color:var(--text-faint); background:rgba(128,128,128,0.12); }
+/* Evil tier: red */
+.alignment-LE,.alignment-NE,.alignment-CE { color:#e05050; background:rgba(224,80,80,0.12); }
+.alignment-label { font-size: 0.78em; color: var(--text-faint); font-style: italic; }
+
+/* === BATTLE MODE: STICKY SIDEBAR CARDS === */
+body.battle-active #char-grid { margin: 0; padding: 0; min-height: 0; }
+
+body.battle-active #stat-block-1,
+body.battle-active #stat-block-2 {
+  position: fixed;
+  top: 50%;
+  width: 155px;
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 100;
+  padding: 12px 10px;
+  box-sizing: border-box;
+}
+body.battle-active #stat-block-1 {
+  left: 0;
+  transform: translateY(-50%);
+  border-radius: 0 8px 8px 0;
+  border-left: none;
+  animation: sbSlideInLeft 0.45s cubic-bezier(0.4,0,0.2,1) both;
+}
+body.battle-active #stat-block-2 {
+  right: 0;
+  transform: translateY(-50%);
+  border-radius: 8px 0 0 8px;
+  border-right: none;
+  animation: sbSlideInRight 0.45s cubic-bezier(0.4,0,0.2,1) both;
+}
+@keyframes sbSlideInLeft  { from { transform: translateX(-100%) translateY(-50%); } to { transform: translateX(0) translateY(-50%); } }
+@keyframes sbSlideInRight { from { transform: translateX(100%)  translateY(-50%); } to { transform: translateX(0) translateY(-50%); } }
+
+/* Condensed content: hide verbose elements */
+body.battle-active .stat-block .stat-block-title,
+body.battle-active .stat-block .ability-scores,
+body.battle-active .stat-block .skill-list,
+body.battle-active .stat-block .stat-divider { display: none; }
+body.battle-active .stat-block .stat-line { font-size: 0.75em; margin: 2px 0; }
+body.battle-active .stat-block .stat-block-name { font-size: 1em; }
+body.battle-active .stat-block .stat-block-class { font-size: 0.72em; }
+
+/* Push HP bars and combat log inward to avoid cards */
+body.battle-active #hp-bars,
+body.battle-active #combat-section,
+body.battle-active #result-banner { margin-left: 162px; margin-right: 162px; }
 .sheet-subclass-line {
   font-family: var(--font-body);
   font-size: 0.88em;
@@ -764,6 +827,49 @@ body {
 .boss-progress-step.done   { border-color: var(--green); color: var(--green); }
 .boss-progress-step.active { border-color: var(--heading); color: var(--heading); background: var(--bg-stat); font-weight: 700; }
 .boss-progress-step.dead   { border-color: var(--red); color: var(--red); }
+
+/* ===== GRAND MELEE ===== */
+.melee-hp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.melee-fighter-row {
+  background: var(--bg-stat);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  transition: opacity 0.4s;
+}
+.melee-fighter-row.eliminated {
+  opacity: 0.38;
+  border-style: dashed;
+}
+.melee-fighter-name {
+  font-family: var(--font-heading);
+  font-size: 0.78em;
+  color: var(--heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.melee-fighter-info { font-size: 0.68em; color: var(--text-faint); margin: 1px 0 3px; }
+.melee-hp-track { height: 5px; background: var(--bg-surface); border-radius: 3px; overflow: hidden; }
+.melee-hp-fill { height: 100%; background: var(--green,#27ae60); border-radius: 3px; transition: width 0.5s ease; }
+.melee-kill-order {
+  margin-top: 10px;
+  font-family: var(--font-body);
+  font-size: 0.8em;
+  color: var(--text-faint);
+}
+.melee-kill-order .kill-entry { padding: 2px 0; }
+.melee-kill-order .kill-entry span { color: var(--red); font-weight: 600; }
+#melee-names { width: 100%; box-sizing: border-box; }
+.view-hint { font-size: 0.85em; color: var(--text-faint); font-style: italic; margin-bottom: 8px; }
 
 .stat-divider {
   border: none;
@@ -1476,6 +1582,11 @@ body {
           <div class="mode-card-name" data-i18n="mode_boss">BOSS RUSH</div>
           <div class="mode-card-cn" data-i18n="mode_boss_cn">Boss 挑战</div>
         </div>
+        <div class="mode-card" id="btn-melee">
+          <div class="mode-card-icon">⚔️⚔️</div>
+          <div class="mode-card-name" data-i18n="mode_melee">GRAND MELEE</div>
+          <div class="mode-card-cn" data-i18n="mode_melee_cn">大混战</div>
+        </div>
       </div>
       <hr class="ornament-divider">
       <p style="font-family:var(--font-body);font-size:0.85em;color:var(--text-faint);font-style:italic;" data-i18n="landing_hint">
@@ -1668,6 +1779,54 @@ body {
       </div>
     </div>
 
+    <!-- ===========================
+         VIEW: GRAND MELEE
+         =========================== -->
+    <div id="view-melee" class="view">
+      <div class="view-header">
+        <button class="back-btn" id="melee-back" data-i18n="back">← BACK</button>
+        <span class="view-title" data-i18n="melee_title">⚔️ GRAND MELEE</span>
+      </div>
+
+      <!-- Setup -->
+      <div id="melee-setup">
+        <p class="view-hint" data-i18n="melee_hint">每行一个名字（至少3人，无上限）：</p>
+        <textarea id="melee-names" rows="8" placeholder="张伟&#10;李明&#10;王芳&#10;赵磊&#10;陈静"></textarea>
+        <div style="text-align:center;margin-top:12px;">
+          <button class="btn" id="btn-start-melee" data-i18n="btn_start_melee">FIGHT!</button>
+        </div>
+      </div>
+
+      <!-- Arena -->
+      <div id="melee-arena" style="display:none;">
+        <!-- All fighters HP bars -->
+        <div id="melee-hp-grid" class="melee-hp-grid"></div>
+        <hr class="stat-divider" style="margin:10px 0;">
+        <!-- Combat controls -->
+        <div class="combat-controls">
+          <span class="combat-round-label" id="melee-round-label">ROUND 0</span>
+          <div class="speed-controls" id="melee-speed-controls">
+            <button class="speed-btn active" data-melee-speed="1">1×</button>
+            <button class="speed-btn" data-melee-speed="2">2×</button>
+            <button class="speed-btn" data-melee-speed="0">⏩</button>
+          </div>
+        </div>
+        <!-- Combat log -->
+        <div class="combat-log" id="melee-log" style="height:300px;"></div>
+        <!-- Kill order -->
+        <div id="melee-kill-order" class="melee-kill-order"></div>
+        <!-- Result -->
+        <div class="result-banner" id="melee-result">
+          <div class="result-winner" id="melee-result-title">—</div>
+          <div class="result-detail" id="melee-result-detail">—</div>
+          <div class="result-actions">
+            <button class="btn btn-sm" id="btn-melee-rematch" data-i18n="btn_melee_rematch">REMATCH</button>
+            <button class="btn btn-outline btn-sm" id="btn-melee-reset" data-i18n="btn_melee_reset">NEW MELEE</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -1696,6 +1855,7 @@ const LANG = {
     title:'名字竞技场', subtitle_en:'输入名字，铸就命运', subtitle_cn:'',
     mode_duel:'1V1 决斗', mode_duel_cn:'', mode_sheet:'角色卡', mode_sheet_cn:'',
     mode_tournament:'锦标赛', mode_tournament_cn:'', mode_boss:'Boss 挑战', mode_boss_cn:'',
+    mode_melee:'大混战', mode_melee_cn:'',
     coming_soon:'即将推出', landing_hint:'同一名字永远生成同一角色。同一对阵永远重演同一战斗。',
     back:'← 返回', duel_title:'⚔ 1V1 决斗', fighter_1:'战士 I', fighter_2:'战士 II',
     btn_fight:'决斗！', btn_rematch:'再战', btn_share:'复制结果', btn_generate:'生成',
@@ -1709,6 +1869,8 @@ const LANG = {
     skill_use:'使用{skill}！', knock_out:'{name}倒下了！', timeout:'超时判定',
     tournament_title:'锦标赛', tournament_hint:'输入4-16个名字，每行一个：',
     btn_start_tournament:'开始锦标赛', btn_reset:'重新开始',
+    melee_title:'⚔️ 大混战', melee_hint:'每行一个名字（至少3人，无上限）：',
+    btn_start_melee:'开战！', btn_melee_rematch:'再战', btn_melee_reset:'重新输入',
     boss_title:'Boss挑战', boss_hint:'输入你的名字，挑战5位Boss：',
     btn_start_boss:'开始挑战', boss_victory:'Boss挑战完成！你击败了所有Boss！',
     boss_defeated:'你被击败了！', boss_restore:'生命恢复中…',
@@ -1718,6 +1880,7 @@ const LANG = {
     title:'Name Arena', subtitle_en:'Enter a name. Forge a destiny.', subtitle_cn:'输入名字，铸就命运',
     mode_duel:'1V1 DUEL', mode_duel_cn:'1对1 决斗', mode_sheet:'CHARACTER', mode_sheet_cn:'角色卡',
     mode_tournament:'TOURNAMENT', mode_tournament_cn:'锦标赛', mode_boss:'BOSS RUSH', mode_boss_cn:'Boss挑战',
+    mode_melee:'GRAND MELEE', mode_melee_cn:'大混战',
     coming_soon:'COMING SOON', landing_hint:'Same name always generates the same character. Same matchup always plays the same battle.',
     back:'← BACK', duel_title:'⚔ 1v1 DUEL', fighter_1:'FIGHTER I', fighter_2:'FIGHTER II',
     btn_fight:'FIGHT!', btn_rematch:'REMATCH', btn_share:'COPY RESULT', btn_generate:'GENERATE',
@@ -1731,6 +1894,8 @@ const LANG = {
     skill_use:'uses {skill}!', knock_out:'{name} is defeated!', timeout:'Timeout — lower HP% loses',
     tournament_title:'TOURNAMENT', tournament_hint:'Enter 4–16 names, one per line:',
     btn_start_tournament:'START TOURNAMENT', btn_reset:'NEW TOURNAMENT',
+    melee_title:'⚔️ GRAND MELEE', melee_hint:'One name per line (3+ fighters, no limit):',
+    btn_start_melee:'FIGHT!', btn_melee_rematch:'REMATCH', btn_melee_reset:'NEW MELEE',
     boss_title:'BOSS RUSH', boss_hint:'Enter your name and face 5 bosses:',
     btn_start_boss:'START BOSS RUSH', boss_victory:'Boss Rush Complete! All bosses defeated!',
     boss_defeated:'You were defeated!', boss_restore:'Restoring HP…',
@@ -2841,7 +3006,22 @@ class Character {
     });
     this.skills.push(subSkill);
 
-    // 7. Combat state (reset before each fight)
+    // 8. Alignment (derived from name hash — two independent axes)
+    this.goodness   = Math.floor(rng() * 9); // 0=极恶 … 8=极善
+    this.lawfulness = Math.floor(rng() * 9); // 0=极混乱 … 8=极守序
+    const gTier = this.goodness   >= 6 ? 'Good'    : this.goodness   >= 3 ? 'Neutral' : 'Evil';
+    const lTier = this.lawfulness >= 6 ? 'Lawful'  : this.lawfulness >= 3 ? 'Neutral' : 'Chaotic';
+    const gCode = this.goodness   >= 6 ? 'G'       : this.goodness   >= 3 ? 'N'       : 'E';
+    const lCode = this.lawfulness >= 6 ? 'L'       : this.lawfulness >= 3 ? 'N'       : 'C';
+    this.alignmentShort = (lCode === 'N' && gCode === 'N') ? 'TN' : lCode + gCode;
+    this.alignment = (lTier === 'Neutral' && gTier === 'Neutral') ? 'True Neutral' : `${lTier} ${gTier}`;
+    this.alignmentZh = {
+      LG:'守序善良',NG:'中立善良',CG:'混乱善良',
+      LN:'守序中立',TN:'绝对中立',CN:'混乱中立',
+      LE:'守序邪恶',NE:'中立邪恶',CE:'混乱邪恶'
+    }[this.alignmentShort] || this.alignment;
+
+    // 9. Combat state (reset before each fight)
     this.resetCombat();
 
     // 8. Apply passive onInit effects
@@ -2868,6 +3048,8 @@ class Character {
     this._shieldUsed  = false;
     this._shieldActive = false;
     this.round = 0;
+    this.aggressors = new Set(); // names of chars who have damaged this char
+    this.healers    = new Set(); // names of chars who have healed this char
   }
 
   startOfTurn() {
@@ -2954,7 +3136,14 @@ class CombatEngine {
     return advantage ? Math.max(r1,r2) : Math.min(r1,r2);
   }
 
-  log(event) { this.events.push(event); }
+  log(event) {
+    // Snapshot HP+tempHP at log time so BattleRenderer can animate bars step-by-step
+    // (characters are already at final HP by the time replay starts)
+    event._hp = {};
+    if (this.char1) event._hp[this.char1.name] = { hp: this.char1.currentHP, tmp: this.char1.tempHP || 0 };
+    if (this.char2 && this.char2 !== this.char1) event._hp[this.char2.name] = { hp: this.char2.currentHP, tmp: this.char2.tempHP || 0 };
+    this.events.push(event);
+  }
 
   // Resolve a full attack roll
   attackRoll(attacker, defender) {
@@ -3066,6 +3255,8 @@ class CombatEngine {
 
   // Apply damage to a creature (handles tempHP, Uncanny Dodge)
   applyDamage(target, amount, source) {
+    // Track aggressor for alignment-based behavior
+    if (source && source.name && target.aggressors) target.aggressors.add(source.name);
     // Uncanny Dodge
     const ud = target.skills.find(s=>s.id==='uncanny_dodge');
     if (ud && ud.onDamaged && ud._usesLeft > 0) {
@@ -3184,6 +3375,13 @@ class CombatEngine {
     active.round = this.round;
     const ctx = { self:active, target:opponent, round:this.round };
 
+    // Alignment axes (default neutral if not set)
+    const goodness   = active.goodness   ?? 4;
+    const lawfulness = active.lawfulness ?? 4;
+    const isChaotic  = lawfulness <= 2;
+    const isGood     = goodness   >= 6;
+    const targetAttackedUs = active.aggressors && active.aggressors.has(opponent.name);
+
     // --- Bonus action first (buffs, heals) ---
     for (const sk of active.skills) {
       if (sk.trigger!=='active' || sk.timing!=='bonus') continue;
@@ -3194,15 +3392,30 @@ class CombatEngine {
     }
 
     // --- Main action ---
-    // Priority-sorted active action skills
+    // Good chars reluctant to attack non-aggressors: -3 to offensive priority
+    const goodPenalty = (isGood && !targetAttackedUs) ? 3 : 0;
     const actionSkills = active.skills
       .filter(sk=>sk.trigger==='active' && sk.timing==='action' && sk._usesLeft>0 && (!sk.condition||sk.condition(ctx)))
-      .sort((a,b)=>(b.priority||0)-(a.priority||0));
+      .map(sk => ({ sk, eff: (sk.priority||0) - goodPenalty }))
+      .sort((a,b)=>b.eff-a.eff);
 
     if (actionSkills.length > 0) {
-      const sk = actionSkills[0];
-      sk._usesLeft = sk.uses===Infinity ? Infinity : sk._usesLeft-1;
-      sk.effect(active, opponent, this);
+      let chosen;
+      if (isChaotic && actionSkills.length > 1) {
+        // Chaotic: weighted-random selection (deterministic via seeded combat RNG)
+        const weights = actionSkills.map(s => Math.max(1, s.eff + 50));
+        const total   = weights.reduce((a,b)=>a+b, 0);
+        let r = this.rollD(1, total) - 1;
+        chosen = actionSkills[0].sk;
+        for (let i = 0; i < actionSkills.length; i++) {
+          r -= weights[i];
+          if (r < 0) { chosen = actionSkills[i].sk; break; }
+        }
+      } else {
+        chosen = actionSkills[0].sk;
+      }
+      chosen._usesLeft = chosen.uses===Infinity ? Infinity : chosen._usesLeft-1;
+      chosen.effect(active, opponent, this);
     } else {
       // Default: weapon attacks (or Eldritch Blast for warlock)
       if (active.classKey==='warlock') {
@@ -3301,6 +3514,7 @@ function renderStatBlock(char, el) {
     <div class="stat-block-class">${cls} · Lv.${char.level} · ${char.classDef.icon}</div>
     <div class="stat-block-title">${char.title}</div>
     <div class="stat-block-subclass"><span class="subclass-badge">${cn?(char.subclassName.zh||char.subclassName.en):char.subclassName.en}</span> <span class="subclass-flavor">${cn?(char.subclassFlavor.zh||char.subclassFlavor.en||''):char.subclassFlavor.en||''}</span></div>
+    ${char.alignmentShort ? `<div class="stat-block-alignment"><span class="alignment-badge alignment-${char.alignmentShort}">${char.alignmentShort}</span> <span class="alignment-label">${cn?char.alignmentZh:char.alignment}</span></div>` : ''}
     <hr class="stat-divider">
     <div class="ability-scores">
       ${['STR','DEX','CON','INT','WIS','CHA'].map((ab,i)=>{
@@ -3404,14 +3618,32 @@ const BattleRenderer = {
 
   async play(events, char1, char2, callbacks) {
     this.playing = true;
+    this._playId = (this._playId || 0) + 1;
+    const myId = this._playId;
     this.skipRequested = false;
     const log  = callbacks.logEl || document.getElementById('combat-log');
     log.innerHTML = '';
 
     let currentRound = 0;
+    let deathSounded = false;
+
+    // Apply HP snapshot from event onto character objects so onHP reads the
+    // correct intermediate value rather than the final post-battle value.
+    const applySnapshot = (ev) => {
+      if (!ev._hp) return;
+      const map = callbacks.fighterMap;
+      for (const [name, snap] of Object.entries(ev._hp)) {
+        const f = map ? map.get(name)
+                      : (char1.name === name ? char1 : char2.name === name ? char2 : null);
+        if (f) {
+          f.currentHP = snap.hp;
+          f.tempHP    = snap.tmp;
+        }
+      }
+    };
 
     for (const ev of events) {
-      if (!this.playing) break;
+      if (!this.playing || this._playId !== myId) break;
 
       if (ev.type === 'round_start') {
         currentRound = ev.data.round;
@@ -3420,18 +3652,27 @@ const BattleRenderer = {
         continue;
       }
 
-      const line = this._buildLine(ev, char1, char2);
+      // For 'victory', ev.actor is undefined — fall back to ev.data.winner for map lookup
+      const _c1 = callbacks.fighterMap
+        ? (callbacks.fighterMap.get(ev.actor) || callbacks.fighterMap.get(ev.data?.winner) || char1)
+        : char1;
+      const _c2 = callbacks.fighterMap ? (callbacks.fighterMap.get(ev.target) || char2) : char2;
+      const line = this._buildLine(ev, _c1, _c2);
       if (line) {
         if (this.skipRequested) {
           // Instant mode: no animation delay
-          const el = this._appendEntry(log, line, true);
+          this._appendEntry(log, line, true);
+          applySnapshot(ev);
+          if (callbacks.onHP) callbacks.onHP(char1, char2);
         } else {
-          const el = this._appendEntry(log, line, false);
+          this._appendEntry(log, line, false);
+          applySnapshot(ev);
+          if (callbacks.onHP) callbacks.onHP(char1, char2);
           log.scrollTop = log.scrollHeight;
 
           // Visual effects
           if (ev.type==='attack' && ev.data.crit) this._triggerCrit();
-          if ((ev.type==='attack'||ev.type==='spell'||ev.type==='beam') && ev.data.hit && ev.data.dmg > 0) {
+          if ((ev.type==='attack'||ev.type==='spell'||ev.type==='beam') && ev.data.hit && (ev.data.dmg||ev.data.final) > 0) {
             const side = ev.actor === char1.name ? 'right' : 'left';
             this._floatDamage(ev.data.dmg||ev.data.final||0, side, ev.data.dmgType);
           }
@@ -3441,21 +3682,28 @@ const BattleRenderer = {
           }
 
           await this._sleep(this.delay);
+          if (this._playId !== myId) break;
         }
+      } else {
+        // No log line but may still change HP (conditions, etc.)
+        applySnapshot(ev);
+        if (callbacks.onHP) callbacks.onHP(char1, char2);
       }
 
-      // HP update after each event
-      if (callbacks.onHP) callbacks.onHP(char1, char2);
-      if (!char1.isAlive || !char2.isAlive) AudioManager.death();
-
-      // Death check
-      if ((ev.type==='attack'||ev.type==='spell'||ev.type==='beam'||ev.type==='dot') && callbacks.onHP) {
-        callbacks.onHP(char1, char2);
+      // Grand Melee: fire once per elimination event
+      // Duel/Boss: fire once when first character drops to 0 HP
+      if (ev.type === 'elimination') {
+        AudioManager.death();
+      } else if (!callbacks.fighterMap && !deathSounded && (!char1.isAlive || !char2.isAlive)) {
+        AudioManager.death();
+        deathSounded = true;
       }
     }
 
-    log.scrollTop = log.scrollHeight;
-    this.playing = false;
+    if (this._playId === myId) {
+      log.scrollTop = log.scrollHeight;
+      this.playing = false;
+    }
   },
 
   _addRoundHeader(log, round) {
@@ -3574,6 +3822,16 @@ const BattleRenderer = {
           : `<span class="crit">⚔ ${d.winner} (${cls}) wins! ${d.rounds} rounds.</span>`;
       }
 
+      case 'initiative_melee': {
+        const list = (d.fighters||[]).map(x=>`${x.name}: <span class="dice">${x.init}</span>`).join('，');
+        return `<span class="narr">${cn?'先攻掷骰 — ':'Initiative — '}${list}</span>`;
+      }
+      case 'elimination': {
+        const rem = d.remaining;
+        return cn
+          ? `<span class="crit">💀 ${ev.actor} 击倒了 ${ev.target}！${rem>0?`还剩 ${rem} 人`:'最后一人！'}</span>`
+          : `<span class="crit">💀 ${ev.actor} eliminated ${ev.target}! ${rem>0?`${rem} remain`:'Last one standing!'}</span>`;
+      }
       default: return null;
     }
   },
@@ -3643,11 +3901,25 @@ function _updateBar(fillId, textId, char) {
   const fill = document.getElementById(fillId);
   const text = document.getElementById(textId);
   if (!fill || !text) return;
-  const pct = Math.max(0, char.currentHP / char.maxHP);
-  fill.style.width = Math.round(pct*100) + '%';
-  text.textContent = `${Math.max(0,char.currentHP)} / ${char.maxHP} HP`;
-  const tier = pct > 0.6 ? 'high' : pct > 0.3 ? 'medium' : pct > 0.1 ? 'low' : 'critical';
-  fill.setAttribute('data-pct', tier);
+  const hp  = Math.max(0, char.currentHP);
+  const tmp = char.tempHP || 0;
+  const max = char.maxHP;
+  // Bar width: effective HP capped at 100% of track
+  const totalPct = Math.min(100, Math.round((hp + tmp) / max * 100));
+  fill.style.width = totalPct + '%';
+  if (tmp > 0) {
+    // Split gradient: HP color on left, gold tempHP on right
+    const hpColor = hp/max > 0.6 ? '#27ae60' : hp/max > 0.3 ? '#c8a017' : '#c0391c';
+    const splitPct = Math.round(hp / (hp + tmp) * 100) + '%';
+    fill.style.background = `linear-gradient(90deg, ${hpColor} ${splitPct}, #b8860b ${splitPct})`;
+    fill.setAttribute('data-pct', 'temp'); // prevent CSS data-pct from overriding
+    text.textContent = `${hp}+${tmp} / ${max} HP`;
+  } else {
+    fill.style.background = ''; // restore CSS data-pct gradient
+    const pct = hp / max;
+    fill.setAttribute('data-pct', pct > 0.6 ? 'high' : pct > 0.3 ? 'medium' : pct > 0.1 ? 'low' : 'critical');
+    text.textContent = `${hp} / ${max} HP`;
+  }
 }
 
 /* =====================================================================
@@ -3706,6 +3978,133 @@ const TournamentEngine = {
     return rounds[rounds.length - 1][0].winner;
   }
 };
+
+/* =====================================================================
+   GRAND MELEE ENGINE
+   ===================================================================== */
+class GrandMeleeEngine extends CombatEngine {
+  constructor(names) {
+    const fighters = names.map(n => new Character(n));
+    super(fighters[0], fighters[1]); // CombatEngine base setup
+    this.fighters = fighters;
+    this.aggroMap = new Map();  // attacker.name → last target.name
+    this.killOrder = [];
+    // Seed RNG from all names XOR'd together for determinism
+    const allSeed = names.reduce((acc, n) => acc ^ NameHasher.hash(n), 0);
+    this.rng = NameHasher.seededRNG(allSeed);
+  }
+
+  // Override: snapshot ALL fighters' HP+tempHP (not just the active pair)
+  log(event) {
+    event._hp = Object.fromEntries(this.fighters.map(f => [f.name, { hp: f.currentHP, tmp: f.tempHP || 0 }]));
+    this.events.push(event);
+  }
+
+  fightMelee() {
+    // Reset all fighters
+    for (const f of this.fighters) {
+      f.resetCombat();
+      for (const sk of f.skills) { if (sk.trigger==='passive' && sk.onInit) sk.onInit(f); }
+      if (f.classKey==='paladin')  f._smiteUses=4;
+      if (f.classKey==='wizard')   { f._shieldCharges=2; f._fireball_used=false; }
+      if (f.classKey==='monk')     f._ki=5;
+      if (f.classKey==='warlock')  f._agathysDone=false;
+      if (f.classKey==='bard')     f._cwCharges=3;
+      if (f.classKey==='sorcerer') { f._twinReady=true; f._twinUsed=false; }
+    }
+    this.events = [];
+    this.round = 0;
+    this.killOrder = [];
+    this.aggroMap.clear();
+    this.extraAttackThisTurn = false;
+
+    // Initiative order
+    const withInit = this.fighters.map(f => ({ f, init: this.rollD20() + f.initiative }));
+    withInit.sort((a,b) => b.init - a.init);
+    const order = withInit.map(x => x.f);
+    this.log({ type:'initiative_melee', data:{ fighters: withInit.map(x=>({ name:x.f.name, init:x.init })) } });
+
+    // Main combat loop — max 30 rounds for large groups
+    for (this.round = 1; this.round <= 30; this.round++) {
+      if (order.filter(f=>f.isAlive).length <= 1) break;
+      this.log({ type:'round_start', data:{ round:this.round } });
+
+      for (const active of order) {
+        if (!active.isAlive) continue;
+        const living = order.filter(f => f.isAlive && f !== active);
+        if (living.length === 0) break;
+
+        active.startOfTurn();
+        const target = this._selectTarget(active, living);
+        this.aggroMap.set(active.name, target.name);
+
+        // Reuse base class DoT processing (Spirit Guardians, Call Lightning, stun)
+        this.char1 = active; this.char2 = target;
+        const skip = this.processStartOfTurn(active, target);
+
+        if (!skip) this.chooseAndAct(active, target);
+
+        if (!target.isAlive) {
+          this.killOrder.push({ name:target.name, round:this.round, killedBy:active.name });
+          const remaining = order.filter(f=>f.isAlive).length;
+          this.log({ type:'elimination', actor:active.name, target:target.name,
+            data:{ round:this.round, remaining } });
+        }
+      }
+    }
+
+    const survivors = order.filter(f=>f.isAlive);
+    const winner = survivors.length > 0 ? survivors[0]
+      : order.reduce((a,b) => a.hpPct > b.hpPct ? a : b);
+    this.log({ type:'victory', data:{ winner:winner.name, rounds:this.round } });
+    return { winner, events:this.events, killOrder:this.killOrder, fighters:this.fighters };
+  }
+
+  _selectTarget(attacker, living) {
+    const lawfulness = attacker.lawfulness ?? 4;
+    const goodness   = attacker.goodness   ?? 4;
+    const isChaotic  = lawfulness <= 2;
+    const isGood     = goodness   >= 6;
+
+    const weights = living.map(target => {
+      // Base success weight: lower HP and AC = easier target
+      let w = 10
+        + Math.max(0, 50 - target.currentHP) * 0.15
+        - Math.max(0, target.ac - 12) * 1.0;
+      w = Math.max(1, w);
+
+      // Retaliation: target attacked us last turn → strong aggro
+      if (this.aggroMap.get(target.name) === attacker.name) w += 14;
+      // Momentum: we attacked this target last turn → continue
+      if (this.aggroMap.get(attacker.name) === target.name) w += 6;
+
+      // Lawfulness axis
+      if (lawfulness >= 6) {
+        // Lawful: amplify rational success factors (pick weakest)
+        w += Math.max(0, 50 - target.currentHP) * 0.15;
+      } else if (isChaotic) {
+        // Chaotic: add large noise via seeded RNG
+        w += this.rollD(1, 20) - 5;
+      }
+
+      // Goodness axis: reluctant to attack non-aggressors
+      if (isGood && !attacker.aggressors.has(target.name)) w *= 0.25;
+
+      return Math.max(0.5, w);
+    });
+
+    // Weighted random selection (deterministic via seeded RNG)
+    const total = weights.reduce((a,b)=>a+b, 0);
+    // Scale to integer range for rollD
+    const scale = 1000;
+    let r = this.rollD(1, Math.ceil(total * scale)) - 1;
+    for (let i = 0; i < living.length; i++) {
+      r -= weights[i] * scale;
+      if (r <= 0) return living[i];
+    }
+    return living[living.length - 1];
+  }
+}
 
 /* =====================================================================
    BOSS RUSH CONTROLLER
@@ -3973,6 +4372,33 @@ const GameUI = {
       if(e.target===e.currentTarget) e.currentTarget.classList.remove('open');
     });
 
+    // Grand Melee navigation
+    document.getElementById('btn-melee')?.addEventListener('click', ()=>this.showView('melee'));
+    document.getElementById('melee-back').addEventListener('click', ()=>{ BattleRenderer.playing=false; this.showView('landing'); });
+    document.getElementById('btn-start-melee').addEventListener('click', ()=>this.startMelee());
+    document.getElementById('btn-melee-rematch').addEventListener('click', ()=>{
+      if (this._meleeNames) {
+        document.getElementById('melee-names').value = this._meleeNames.join('\n');
+        document.getElementById('melee-setup').style.display = 'block';
+        document.getElementById('melee-arena').style.display = 'none';
+      }
+      this.startMelee();
+    });
+    document.getElementById('btn-melee-reset').addEventListener('click', ()=>{
+      BattleRenderer.playing = false;
+      document.getElementById('melee-setup').style.display = 'block';
+      document.getElementById('melee-arena').style.display = 'none';
+    });
+    document.querySelectorAll('[data-melee-speed]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sp = parseInt(btn.dataset.meleeSpeed);
+        BattleRenderer.speed = sp;
+        if (sp === 0) BattleRenderer.skip();
+        document.querySelectorAll('#melee-speed-controls .speed-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
     // Boss Rush navigation
     document.getElementById('btn-boss')?.addEventListener('click', ()=>{ this.initBossRush(); this.showView('boss'); });
     document.getElementById('boss-back').addEventListener('click', ()=>{
@@ -4075,6 +4501,7 @@ const GameUI = {
   showView(name) {
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     document.getElementById('view-'+name).classList.add('active');
+    if (name !== 'duel') document.body.classList.remove('battle-active');
   },
 
   applyI18n() {
@@ -4102,6 +4529,9 @@ const GameUI = {
     grid.style.display = 'grid';
     renderStatBlock(this.char1, document.getElementById('stat-block-1'));
     renderStatBlock(this.char2, document.getElementById('stat-block-2'));
+
+    // Activate sidebar layout (cards fly to sides during battle)
+    document.body.classList.add('battle-active');
 
     // Show HP bars
     const hpSection = document.getElementById('hp-bars');
@@ -4418,6 +4848,111 @@ const GameUI = {
     } catch(e) {
       showToast(currentLang==='zh'?'截图失败，请手动截图':'Screenshot failed');
     }
+  },
+
+  // ── GRAND MELEE ────────────────────────────────────────────────────
+  async startMelee() {
+    const cn = currentLang === 'zh';
+    const raw = document.getElementById('melee-names').value;
+    const names = raw.split('\n').map(s=>s.trim()).filter(Boolean);
+    if (names.length < 3) {
+      showToast(cn ? '至少需要3名参战者' : 'Need at least 3 fighters');
+      return;
+    }
+
+    document.getElementById('melee-setup').style.display  = 'none';
+    document.getElementById('melee-arena').style.display  = 'block';
+    document.getElementById('melee-result').classList.remove('visible');
+    document.getElementById('melee-kill-order').innerHTML = '';
+
+    // Build engine & run synchronous combat
+    const engine = new GrandMeleeEngine(names);
+    this._meleeResult = engine.fightMelee();
+    const { fighters, events, killOrder } = this._meleeResult;
+    this._meleeNames = names;
+
+    // Render HP grid
+    this._buildMeleeHPGrid(fighters);
+
+    // Reset speed
+    document.querySelectorAll('#melee-speed-controls .speed-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelector('#melee-speed-controls .speed-btn[data-melee-speed="1"]').classList.add('active');
+    BattleRenderer.speed = 1;
+
+    // Play async log
+    const fighterMap = new Map(fighters.map(f=>[f.name, f]));
+    await BattleRenderer.play(events, fighters[0], fighters[1], {
+      logEl: document.getElementById('melee-log'),
+      fighterMap,
+      onRound: (r) => {
+        document.getElementById('melee-round-label').textContent =
+          cn ? `第 ${r} 回合` : `Round ${r}`;
+      },
+      onHP: () => this._updateMeleeHP(fighters),
+    });
+
+    this._showMeleeResult(this._meleeResult, killOrder, cn);
+  },
+
+  _buildMeleeHPGrid(fighters) {
+    const cn = currentLang === 'zh';
+    const grid = document.getElementById('melee-hp-grid');
+    grid.innerHTML = fighters.map(f => {
+      const cls = cn ? f.classDef.name.zh : f.classDef.name.en;
+      const al  = f.alignmentShort || '';
+      const alCls = al ? `alignment-${al}` : '';
+      return `<div class="melee-fighter-row" id="melee-row-${CSS.escape(f.name)}">
+        <div class="melee-fighter-name">
+          <span>${f.classDef.icon}</span>
+          <span>${f.name}</span>
+          ${al ? `<span class="alignment-badge ${alCls}" style="font-size:0.6em;padding:0 4px;">${al}</span>` : ''}
+        </div>
+        <div class="melee-fighter-info">${cls} · HP ${f.maxHP} · AC ${f.ac}</div>
+        <div class="melee-hp-track">
+          <div class="melee-hp-fill" id="melee-hp-${CSS.escape(f.name)}" style="width:100%"></div>
+        </div>
+      </div>`;
+    }).join('');
+  },
+
+  _updateMeleeHP(fighters) {
+    for (const f of fighters) {
+      const fill = document.getElementById('melee-hp-' + CSS.escape(f.name));
+      const row  = document.getElementById('melee-row-' + CSS.escape(f.name));
+      if (!fill) continue;
+      const hp  = Math.max(0, f.currentHP);
+      const tmp = f.tempHP || 0;
+      const max = f.maxHP;
+      const totalPct = Math.min(100, Math.round((hp + tmp) / max * 100));
+      fill.style.width = totalPct + '%';
+      if (tmp > 0) {
+        const hpColor = hp/max > 0.6 ? '#27ae60' : hp/max > 0.3 ? '#c8a017' : '#c0391c';
+        const splitPct = Math.round(hp / (hp + tmp) * 100) + '%';
+        fill.style.background = `linear-gradient(90deg, ${hpColor} ${splitPct}, #b8860b ${splitPct})`;
+      } else {
+        fill.style.background = hp/max > 0.6 ? '#27ae60' : hp/max > 0.3 ? '#c8a017' : '#c0391c';
+      }
+      if (!f.isAlive && row) row.classList.add('eliminated');
+    }
+  },
+
+  _showMeleeResult(result, killOrder, cn) {
+    const { winner, rounds } = result;
+    const banner = document.getElementById('melee-result');
+    const cls = cn ? winner.classDef.name.zh : winner.classDef.name.en;
+    document.getElementById('melee-result-title').textContent =
+      `🏆 ${winner.name} (${cls})`;
+    document.getElementById('melee-result-detail').textContent =
+      cn ? `共 ${rounds} 回合` : `${rounds} rounds`;
+
+    // Kill order log
+    const koEl = document.getElementById('melee-kill-order');
+    if (killOrder.length) {
+      koEl.innerHTML = '<div style="font-weight:600;margin-bottom:4px;">'
+        + (cn ? '淘汰顺序：' : 'Elimination order:') + '</div>'
+        + killOrder.map((k,i) => `<div class="kill-entry">${i+1}. <span>${k.name}</span> ${cn?'被':'eliminated by'} ${k.killedBy} (${cn?`第${k.round}回合`:`R${k.round}`})</div>`).join('');
+    }
+    banner.classList.add('visible');
   },
 
   handleHash() {
