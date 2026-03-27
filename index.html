@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 
 <!-- Flash prevention: apply theme before first paint -->
 <script>
@@ -586,6 +587,184 @@ body {
   border-radius: 3px;
   margin-right: 6px;
 }
+
+/* ===== TOURNAMENT ===== */
+.tournament-hint {
+  font-family: var(--font-body);
+  color: var(--text-sec);
+  font-style: italic;
+  margin-bottom: 10px;
+  text-align: center;
+}
+#tournament-names {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 10px 14px;
+  background: var(--input-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-cn);
+  font-size: 1em;
+  resize: vertical;
+  outline: none;
+}
+#tournament-names:focus { border-color: var(--accent); }
+.bracket-round {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 12px;
+}
+.bracket-wrapper {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  overflow-x: auto;
+  padding: 20px 0;
+}
+.bracket-match {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 10px 14px;
+  min-width: 150px;
+  cursor: pointer;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.bracket-match:hover { border-color: var(--gold); box-shadow: 0 2px 8px var(--shadow); }
+.bracket-match.pending { opacity: 0.5; cursor: default; }
+.bracket-match.pending:hover { border-color: var(--border); box-shadow: none; }
+.bracket-match-label {
+  font-family: var(--font-heading);
+  font-size: 0.65em;
+  color: var(--text-faint);
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+.bracket-slot {
+  font-family: var(--font-cn);
+  font-size: 0.9em;
+  padding: 4px 0;
+  color: var(--text);
+  border-bottom: 1px solid var(--border-faint);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+.bracket-slot:last-child { border-bottom: none; }
+.bracket-slot.winner { color: var(--heading); font-weight: 700; }
+.bracket-slot.loser  { color: var(--text-faint); text-decoration: line-through; }
+.bracket-slot .slot-class {
+  font-family: var(--font-heading);
+  font-size: 0.65em;
+  color: var(--text-faint);
+  letter-spacing: 0.05em;
+}
+.bracket-connector {
+  width: 20px;
+  border-top: 1.5px solid var(--border);
+  flex-shrink: 0;
+}
+.tournament-champion {
+  text-align: center;
+  padding: 24px;
+  margin-top: 20px;
+  background: var(--bg-stat);
+  border: 2px solid var(--gold);
+  border-radius: var(--radius-lg);
+}
+.champion-title {
+  font-family: var(--font-display);
+  color: var(--heading);
+  font-size: 1.4em;
+  margin-bottom: 6px;
+}
+.champion-detail { font-family: var(--font-body); color: var(--text-sec); }
+#match-modal {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#match-modal.open { display: flex; }
+.match-modal-inner {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 40px var(--shadow-lg);
+}
+.match-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.match-modal-title { font-family: var(--font-heading); color: var(--heading); font-size: 1.05em; font-weight: 700; }
+.modal-close-btn { background:none; border:none; color:var(--text-faint); font-size:1.3em; line-height:1; cursor:pointer; }
+.modal-close-btn:hover { color:var(--heading); }
+
+/* ===== BOSS RUSH ===== */
+.boss-preview {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+.boss-chip {
+  font-size: 1.6em;
+  padding: 8px 12px;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: default;
+  transition: transform var(--transition);
+  text-align: center;
+  min-width: 60px;
+}
+.boss-chip-name {
+  font-family: var(--font-cn);
+  font-size: 0.42em;
+  color: var(--text-sec);
+  display: block;
+  margin-top: 2px;
+}
+.boss-progress {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.boss-progress-step {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-heading);
+  font-size: 0.72em;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  color: var(--text-faint);
+  background: var(--bg-surface);
+}
+.boss-progress-step.done   { border-color: var(--green); color: var(--green); }
+.boss-progress-step.active { border-color: var(--heading); color: var(--heading); background: var(--bg-stat); font-weight: 700; }
+.boss-progress-step.dead   { border-color: var(--red); color: var(--red); }
+
 .stat-divider {
   border: none;
   height: 1.5px;
@@ -1241,6 +1420,7 @@ body {
   <header id="topbar">
     <span id="topbar-title">⚔ NAME ARENA</span>
     <div class="topbar-controls">
+      <button class="topbar-btn" id="audio-toggle" title="Toggle sound">🔊</button>
       <button class="topbar-btn" id="lang-toggle">EN</button>
       <button class="topbar-btn" id="settings-toggle">⚙</button>
     </div>
@@ -1286,17 +1466,15 @@ body {
           <div class="mode-card-name" data-i18n="mode_sheet">CHARACTER</div>
           <div class="mode-card-cn" data-i18n="mode_sheet_cn">角色卡查看</div>
         </div>
-        <div class="mode-card disabled">
+        <div class="mode-card" id="btn-tournament">
           <div class="mode-card-icon">🏆</div>
           <div class="mode-card-name" data-i18n="mode_tournament">TOURNAMENT</div>
           <div class="mode-card-cn" data-i18n="mode_tournament_cn">锦标赛</div>
-          <span class="mode-card-badge" data-i18n="coming_soon">COMING SOON</span>
         </div>
-        <div class="mode-card disabled">
+        <div class="mode-card" id="btn-boss">
           <div class="mode-card-icon">💀</div>
           <div class="mode-card-name" data-i18n="mode_boss">BOSS RUSH</div>
           <div class="mode-card-cn" data-i18n="mode_boss_cn">Boss 挑战</div>
-          <span class="mode-card-badge" data-i18n="coming_soon">COMING SOON</span>
         </div>
       </div>
       <hr class="ornament-divider">
@@ -1402,11 +1580,108 @@ body {
       </div>
       <div id="sheet-output"></div>
       <div class="sheet-actions" id="sheet-actions" style="display:none;">
+        <button class="btn btn-sm" id="btn-export-sheet" data-i18n="btn_export_sheet">📷 EXPORT PNG</button>
         <button class="btn btn-outline btn-sm" id="btn-copy-sheet" data-i18n="btn_copy_sheet">COPY TEXT</button>
       </div>
     </div>
 
+    <!-- ===========================
+         VIEW: TOURNAMENT
+         =========================== -->
+    <div id="view-tournament" class="view">
+      <div class="view-header">
+        <button class="back-btn" id="tournament-back" data-i18n="back">← BACK</button>
+        <span class="view-title">🏆 <span data-i18n="tournament_title">TOURNAMENT</span></span>
+      </div>
+      <!-- Setup phase -->
+      <div id="tournament-setup">
+        <p class="tournament-hint" data-i18n="tournament_hint">Enter 4–16 names, one per line:</p>
+        <textarea id="tournament-names" rows="8" placeholder="张伟&#10;李明&#10;王芳&#10;赵磊"></textarea>
+        <div style="text-align:center;margin-top:12px;">
+          <button class="btn" id="btn-start-tournament" data-i18n="btn_start_tournament">START TOURNAMENT</button>
+        </div>
+      </div>
+      <!-- Bracket display -->
+      <div id="tournament-bracket" style="display:none;">
+        <div id="bracket-container"></div>
+        <div style="text-align:center;margin-top:20px;">
+          <button class="btn btn-outline btn-sm" id="btn-tournament-reset" data-i18n="btn_reset">NEW TOURNAMENT</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===========================
+         VIEW: BOSS RUSH
+         =========================== -->
+    <div id="view-boss" class="view">
+      <div class="view-header">
+        <button class="back-btn" id="boss-back" data-i18n="back">← BACK</button>
+        <span class="view-title">💀 <span data-i18n="boss_title">BOSS RUSH</span></span>
+      </div>
+      <!-- Setup -->
+      <div id="boss-setup">
+        <p class="tournament-hint" data-i18n="boss_hint">Enter your name to face 5 bosses:</p>
+        <div class="duel-input-area" style="justify-content:center;">
+          <input class="name-input" id="boss-player-name" type="text" placeholder="你的名字" maxlength="30" autocomplete="off">
+        </div>
+        <div style="text-align:center;margin-top:12px;">
+          <div class="boss-preview" id="boss-list-preview"></div>
+          <button class="btn" id="btn-start-boss" data-i18n="btn_start_boss">ENTER THE GAUNTLET</button>
+        </div>
+      </div>
+      <!-- Boss Rush arena -->
+      <div id="boss-arena" style="display:none;">
+        <div class="boss-progress" id="boss-progress"></div>
+        <div class="char-grid" id="boss-char-grid">
+          <div id="boss-player-block" class="stat-block"></div>
+          <div id="boss-enemy-block" class="stat-block"></div>
+        </div>
+        <div class="hp-bars-section" id="boss-hp-bars">
+          <div class="hp-bar-row">
+            <div class="hp-bar-labels"><span class="hp-name" id="boss-hp1-name">—</span><span id="boss-hp1-text">—</span></div>
+            <div class="hp-track"><div class="hp-fill" id="boss-hp1-fill" data-pct="high" style="width:100%"></div></div>
+          </div>
+          <div class="hp-bar-row">
+            <div class="hp-bar-labels"><span class="hp-name" id="boss-hp2-name">—</span><span id="boss-hp2-text">—</span></div>
+            <div class="hp-track"><div class="hp-fill" id="boss-hp2-fill" data-pct="high" style="width:100%"></div></div>
+          </div>
+        </div>
+        <div class="combat-section">
+          <div class="combat-controls">
+            <span class="combat-round-label" id="boss-round-label">ROUND 0</span>
+            <div class="speed-controls" id="boss-speed-controls">
+              <button class="speed-btn active" data-boss-speed="1">1×</button>
+              <button class="speed-btn" data-boss-speed="2">2×</button>
+              <button class="speed-btn" data-boss-speed="0">⏩</button>
+            </div>
+          </div>
+          <div class="combat-log" id="boss-log"></div>
+        </div>
+        <div class="result-banner" id="boss-result">
+          <div class="result-winner" id="boss-result-title">—</div>
+          <div class="result-detail" id="boss-result-detail">—</div>
+          <div class="result-actions">
+            <button class="btn btn-sm" id="btn-boss-next">Next Boss ›</button>
+            <button class="btn btn-outline btn-sm" id="btn-boss-retry">Retry</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
+</div>
+
+<!-- Match detail modal -->
+<div id="match-modal">
+  <div class="match-modal-inner">
+    <div class="match-modal-header">
+      <span class="match-modal-title" id="modal-match-title">—</span>
+      <button class="modal-close-btn" id="modal-close">✕</button>
+    </div>
+    <div id="modal-stat-blocks" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;"></div>
+    <div class="combat-log" id="modal-combat-log" style="height:200px;overflow-y:auto;"></div>
+    <div style="text-align:center;margin-top:12px;font-family:var(--font-heading);color:var(--heading);font-size:0.9em;" id="modal-result">—</div>
+  </div>
 </div>
 
 <!-- ===================================================================
@@ -1432,6 +1707,12 @@ const LANG = {
     initiative:'先攻', attacks:'攻击', hits:'命中', miss:'未命中', crit:'暴击！！',
     damage:'{n}点{type}伤害', heals:'恢复{n}点生命', saves_ok:'豁免成功', saves_fail:'豁免失败',
     skill_use:'使用{skill}！', knock_out:'{name}倒下了！', timeout:'超时判定',
+    tournament_title:'锦标赛', tournament_hint:'输入4-16个名字，每行一个：',
+    btn_start_tournament:'开始锦标赛', btn_reset:'重新开始',
+    boss_title:'Boss挑战', boss_hint:'输入你的名字，挑战5位Boss：',
+    btn_start_boss:'开始挑战', boss_victory:'Boss挑战完成！你击败了所有Boss！',
+    boss_defeated:'你被击败了！', boss_restore:'生命恢复中…',
+    btn_export_sheet:'📷 导出图片',
   },
   en: {
     title:'Name Arena', subtitle_en:'Enter a name. Forge a destiny.', subtitle_cn:'输入名字，铸就命运',
@@ -1448,6 +1729,12 @@ const LANG = {
     initiative:'Initiative', attacks:'attacks', hits:'Hit', miss:'Miss', crit:'CRITICAL HIT!!',
     damage:'{n} {type} damage', heals:'Heals {n} HP', saves_ok:'Save success', saves_fail:'Save failed',
     skill_use:'uses {skill}!', knock_out:'{name} is defeated!', timeout:'Timeout — lower HP% loses',
+    tournament_title:'TOURNAMENT', tournament_hint:'Enter 4–16 names, one per line:',
+    btn_start_tournament:'START TOURNAMENT', btn_reset:'NEW TOURNAMENT',
+    boss_title:'BOSS RUSH', boss_hint:'Enter your name and face 5 bosses:',
+    btn_start_boss:'START BOSS RUSH', boss_victory:'Boss Rush Complete! All bosses defeated!',
+    boss_defeated:'You were defeated!', boss_restore:'Restoring HP…',
+    btn_export_sheet:'📷 EXPORT PNG',
   }
 };
 let currentLang = localStorage.getItem('arena_lang') || 'zh';
@@ -2321,6 +2608,165 @@ const SUBCLASSES = {
 };
 
 /* =====================================================================
+   BOSS DATA — preset characters for Boss Rush mode
+   Stats are hand-crafted, not name-generated.
+   ===================================================================== */
+const BOSSES = [
+  { name:{zh:'哥布林酋长',en:'Goblin Chieftain'}, icon:'👺', level:1,
+    str:10,dex:14,con:12,int:8,wis:8,cha:10,
+    classKey:'rogue', hitDie:8, acBase:14, acUseDex:true, acDexCap:99,
+    attackStat:'dex', damageDie:6, extraAttacks:0, isCaster:false,
+    customSkills:[
+      { id:'dirty_tricks', name:{zh:'卑鄙手段',en:'Dirty Tricks'},
+        desc:{zh:'奖励动作投掷毒药：目标体质豁免，失败则每回合3点毒素伤害（2回合）',en:'Bonus: throw poison (CON save or 3 poison dmg/turn, 2 turns)'},
+        uses:2, trigger:'active', timing:'bonus',
+        condition:(c)=>true, priority:60,
+        effect(self,target,eng){
+          const saved=eng.savingThrow(target,'con',12);
+          if(!saved) target.conditions.set('poisoned',{dmg:3,rounds:2});
+          eng.log({type:'skill',actor:self.name,data:{skill:'Dirty Tricks',saved}}); return null; } }
+    ]
+  },
+  { name:{zh:'兽人战酋',en:'Orc Warlord'}, icon:'👹', level:2,
+    str:18,dex:10,con:16,int:8,wis:10,cha:12,
+    classKey:'barbarian', hitDie:12, acBase:14, acUseDex:true, acUseCon:true, acDexCap:99,
+    attackStat:'str', damageDie:12, extraAttacks:1, isCaster:false,
+    customSkills:[
+      { id:'warlord_cry', name:{zh:'战吼',en:'Warlord Cry'},
+        desc:{zh:'主动：下回合所有攻击优势，伤害+4',en:'Action: next turn — advantage and +4 damage'},
+        uses:2, trigger:'active', timing:'action',
+        condition:(c)=>!c.self.conditions.has('warlord_cry'), priority:80,
+        effect(self,target,eng){
+          self.conditions.set('warlord_cry',{rounds:1,dmgBonus:4,advantage:true});
+          eng.log({type:'skill',actor:self.name,data:{skill:'Warlord Cry'}}); return null; } }
+    ]
+  },
+  { name:{zh:'吸血鬼领主',en:'Vampire Lord'}, icon:'🧛', level:3,
+    str:16,dex:16,con:16,int:17,wis:13,cha:18,
+    classKey:'warlock', hitDie:10, acBase:15, acUseDex:true, acDexCap:99,
+    attackStat:'cha', damageDie:10, extraAttacks:0, beams:2, isCaster:true, saveDCStat:'cha',
+    customSkills:[
+      { id:'vampiric_drain', name:{zh:'生命汲取',en:'Vampiric Drain'},
+        desc:{zh:'目标体质豁免，失败受4d6黯蚀伤害，自身恢复一半',en:'CON save or 4d6 necrotic; regain half'},
+        uses:2, trigger:'active', timing:'action',
+        condition:(c)=>true, priority:85,
+        effect(self,target,eng){
+          const dmg=eng.rollD(4,6);
+          const saved=eng.savingThrow(target,'con',16);
+          const final=saved?Math.floor(dmg/2):dmg;
+          eng.applyDamage(target,final,self);
+          const h=Math.floor(final/2); self.currentHP=Math.min(self.maxHP,self.currentHP+h);
+          eng.log({type:'spell',actor:self.name,target:target.name,data:{spell:'Vampiric Drain',final,saved,dmgType:'necrotic'}});
+          eng.log({type:'heal',actor:self.name,data:{amount:h,skill:'Vampiric Drain'}}); return null; } },
+      { id:'mist_form', name:{zh:'薄雾形态',en:'Mist Form'},
+        desc:{zh:'HP降至25%以下时：获得10临时HP，下回合受所有伤害减半',en:'Below 25% HP: +10 temp HP, halve all damage next turn'},
+        uses:1, trigger:'active', timing:'bonus',
+        condition:(c)=>c.self.currentHP<c.self.maxHP*0.25, priority:95,
+        effect(self,target,eng){
+          self.tempHP=(self.tempHP||0)+10; self.conditions.set('mist_form',{rounds:1});
+          eng.log({type:'skill',actor:self.name,data:{skill:'Mist Form'}}); return null; } }
+    ]
+  },
+  { name:{zh:'远古红龙',en:'Ancient Red Dragon'}, icon:'🐉', level:4,
+    str:20,dex:10,con:20,int:16,wis:13,cha:18,
+    classKey:'fighter', hitDie:12, acBase:19, acUseDex:false,
+    attackStat:'str', damageDie:12, extraAttacks:2, isCaster:false,
+    customSkills:[
+      { id:'fire_breath', name:{zh:'火焰吐息',en:'Fire Breath'},
+        desc:{zh:'目标敏捷豁免，失败受10d6火焰伤害（成功减半）',en:'DEX save: 10d6 fire (half on save)'},
+        uses:2, trigger:'active', timing:'action',
+        condition:(c)=>c.target.currentHP>c.target.maxHP*0.2, priority:95,
+        effect(self,target,eng){
+          const dmg=eng.rollD(10,6);
+          const saved=eng.savingThrow(target,'dex',18);
+          const final=saved?Math.floor(dmg/2):dmg;
+          eng.applyDamage(target,final,self);
+          eng.log({type:'spell',actor:self.name,target:target.name,data:{spell:'Fire Breath',final,saved,dmgType:'fire'}}); return null; } },
+      { id:'frightful_presence', name:{zh:'骇人气势',en:'Frightful Presence'},
+        desc:{zh:'首回合：目标感知豁免，失败则下2回合攻击劣势',en:'Round 1: WIS save or disadv on attacks for 2 turns'},
+        uses:1, trigger:'active', timing:'bonus',
+        condition:(c)=>c.self.round===1, priority:100,
+        effect(self,target,eng){
+          const saved=eng.savingThrow(target,'wis',18);
+          if(!saved) target.conditions.set('frightened',{rounds:2});
+          eng.log({type:'skill',actor:self.name,data:{skill:'Frightful Presence',saved}}); return null; } }
+    ]
+  },
+  { name:{zh:'巫妖王',en:'The Lich King'}, icon:'💀', level:5,
+    str:12,dex:16,con:20,int:20,wis:17,cha:16,
+    classKey:'wizard', hitDie:8, acBase:17, acUseDex:true, acDexCap:99,
+    attackStat:'int', damageDie:10, extraAttacks:0, isCaster:true, saveDCStat:'int',
+    customSkills:[
+      { id:'disintegrate', name:{zh:'分解术',en:'Disintegrate'},
+        desc:{zh:'目标体质豁免，失败受12d6+40力场伤害（成功减半）',en:'CON save: 12d6+40 force (half on save)'},
+        uses:1, trigger:'active', timing:'action',
+        condition:(c)=>c.target.currentHP>c.target.maxHP*0.4, priority:100,
+        effect(self,target,eng){
+          const dmg=eng.rollD(12,6)+40;
+          const saved=eng.savingThrow(target,'con',18);
+          const final=saved?Math.floor(dmg/2):dmg;
+          eng.applyDamage(target,final,self);
+          eng.log({type:'spell',actor:self.name,target:target.name,data:{spell:'Disintegrate',final,saved,dmgType:'force'}}); return null; } },
+      { id:'undead_fortitude', name:{zh:'亡灵之韧',en:'Undead Fortitude'},
+        desc:{zh:'HP归零时有50%概率以1点HP存活（每场一次）',en:'On death blow: 50% chance to survive with 1 HP (once/battle)'},
+        uses:1, trigger:'passive',
+        onDamaged(self,dmg){
+          if(self.currentHP-dmg<=0&&self._undeadFort>0){
+            self._undeadFort--;
+            if(Math.random()<0.5){ return self.currentHP-1; }
+          } return dmg; },
+        onInit(self){ self._undeadFort=1; } },
+      { id:'lich_fireball', name:{zh:'死灵火球',en:'Necrotic Fireball'},
+        desc:{zh:'目标敏捷豁免，8d8黯蚀伤害（成功减半）',en:'DEX save: 8d8 necrotic (half on save)'},
+        uses:2, trigger:'active', timing:'action',
+        condition:(c)=>true, priority:85,
+        effect(self,target,eng){
+          const dmg=eng.rollD(8,8);
+          const saved=eng.savingThrow(target,'dex',18);
+          const final=saved?Math.floor(dmg/2):dmg;
+          eng.applyDamage(target,final,self);
+          eng.log({type:'spell',actor:self.name,target:target.name,data:{spell:'Necrotic Fireball',final,saved,dmgType:'necrotic'}}); return null; } }
+    ]
+  },
+];
+
+function createBossCharacter(bossData) {
+  const c = Object.create(Character.prototype);
+  c.name = currentLang==='zh' ? bossData.name.zh : bossData.name.en;
+  c._isBoss = true;
+  c._bossIcon = bossData.icon;
+  c.str=bossData.str; c.dex=bossData.dex; c.con=bossData.con;
+  c.int=bossData.int; c.wis=bossData.wis; c.cha=bossData.cha;
+  c.strMod=mod(c.str); c.dexMod=mod(c.dex); c.conMod=mod(c.con);
+  c.intMod=mod(c.int); c.wisMod=mod(c.wis); c.chaMod=mod(c.cha);
+  c.classKey   = bossData.classKey;
+  c.classDef   = CLASSES[c.classKey];
+  c.className  = c.classDef.name;
+  c.level      = bossData.level + 3;
+  c.proficiencyBonus = 3 + bossData.level;
+  c.attackBonus = c.proficiencyBonus + c[bossData.attackStat+'Mod'];
+  c.spellSaveDC = bossData.isCaster ? 8 + c.proficiencyBonus + c[(bossData.saveDCStat||'int')+'Mod'] : 0;
+  let ac = bossData.acBase;
+  if (bossData.acUseDex) ac += Math.min(c.dexMod, bossData.acDexCap ?? 99);
+  if (bossData.acUseCon) ac += c.conMod;
+  c.ac = ac;
+  const avgDie = Math.floor((bossData.hitDie||10)/2)+1;
+  c.maxHP = (avgDie + 3) * c.level + c.conMod * c.level;
+  c.damageDie   = bossData.damageDie;
+  c.damageBonus = c[bossData.attackStat+'Mod'] + bossData.level;
+  c.initiative  = c.dexMod;
+  c.subclassKey  = 'boss';
+  c.subclassName = {zh:bossData.icon+' Boss',en:bossData.icon+' Boss'};
+  c.subclassFlavor= {zh:'',en:''};
+  c.title = '';
+  c.skills = (bossData.customSkills||[]).map(sk=>Object.assign({},sk,{_usesLeft:sk.uses===Infinity?Infinity:sk.uses}));
+  c.resetCombat();
+  for (const sk of c.skills) { if(sk.trigger==='passive'&&sk.onInit) sk.onInit(c); }
+  if (bossData.beams) c.classDef = Object.assign({},c.classDef,{beams:bossData.beams});
+  return c;
+}
+
+/* =====================================================================
    CHARACTER — builds a full D&D character from a name
    ===================================================================== */
 class Character {
@@ -2959,7 +3405,7 @@ const BattleRenderer = {
   async play(events, char1, char2, callbacks) {
     this.playing = true;
     this.skipRequested = false;
-    const log  = document.getElementById('combat-log');
+    const log  = callbacks.logEl || document.getElementById('combat-log');
     log.innerHTML = '';
 
     let currentRound = 0;
@@ -3000,6 +3446,7 @@ const BattleRenderer = {
 
       // HP update after each event
       if (callbacks.onHP) callbacks.onHP(char1, char2);
+      if (!char1.isAlive || !char2.isAlive) AudioManager.death();
 
       // Death check
       if ((ev.type==='attack'||ev.type==='spell'||ev.type==='beam'||ev.type==='dot') && callbacks.onHP) {
@@ -3042,11 +3489,13 @@ const BattleRenderer = {
       }
       case 'attack': {
         if (d.hit) {
+          if (d.crit) AudioManager.crit(); else AudioManager.hit();
           const critStr = d.crit ? `<span class="crit"> ${cn?'暴击！！':'CRITICAL HIT!!'}</span>` : '';
           return cn
             ? `${ev.actor} ${cn?'攻击':'attacks'} ${ev.target}：<span class="dice">[${d.roll}]</span>+${char1.name===ev.actor?char1.attackBonus:char2.attackBonus} = ${d.total} 对抗 AC ${d.ac}${critStr} — <span class="dmg">${d.dmg} 点${dmgLabel(d.dmgType||'slashing')}伤害</span>`
             : `${ev.actor} attacks ${ev.target}: <span class="dice">[${d.roll}]</span>+${char1.name===ev.actor?char1.attackBonus:char2.attackBonus} = ${d.total} vs AC ${d.ac}${critStr} — <span class="dmg">${d.dmg} ${dmgLabel(d.dmgType||'slashing')} dmg</span>`;
         } else {
+          AudioManager.miss();
           const fumbleStr = d.fumble ? (cn?' <span class="miss">（大失败！）</span>':' <span class="miss">(fumble!)</span>') : '';
           return cn
             ? `<span class="miss">${ev.actor} 攻击 ${ev.target}：<span class="dice">[${d.roll}]</span>+${char1.name===ev.actor?char1.attackBonus:char2.attackBonus} = ${d.total} 对抗 AC ${d.ac} — 未命中${fumbleStr}</span>`
@@ -3054,6 +3503,7 @@ const BattleRenderer = {
         }
       }
       case 'spell': {
+        AudioManager.spell();
         const spellName = `<span class="skill">${d.spell}</span>`;
         if (d.autoHit) {
           return cn
@@ -3085,6 +3535,7 @@ const BattleRenderer = {
           : `<span class="miss">${ev.actor} ${cn?'魔能爆 第':'EB beam '}${d.beam}${cn?'束：未命中':': Miss!'}</span>`;
 
       case 'heal':
+        AudioManager.heal();
         return cn
           ? `${ev.actor} 使用 <span class="skill">${d.skill}</span> — <span class="heal">恢复 ${d.amount} 点生命</span>`
           : `${ev.actor} uses <span class="skill">${d.skill}</span> — <span class="heal">+${d.amount} HP</span>`;
@@ -3115,6 +3566,7 @@ const BattleRenderer = {
           : `<span class="narr">⏱ Time limit reached — higher HP% wins</span>`;
 
       case 'victory': {
+        AudioManager.victory();
         const winnerChar = d.winner===char1.name ? char1 : char2;
         const cls = currentLang==='zh' ? winnerChar.classDef.name.zh : winnerChar.classDef.name.en;
         return cn
@@ -3186,6 +3638,7 @@ function updateHPBars(char1, char2) {
   _updateBar('hp1-fill','hp1-text', char1);
   _updateBar('hp2-fill','hp2-text', char2);
 }
+const _updateBarById = _updateBar; // alias for boss rush
 function _updateBar(fillId, textId, char) {
   const fill = document.getElementById(fillId);
   const text = document.getElementById(textId);
@@ -3196,6 +3649,122 @@ function _updateBar(fillId, textId, char) {
   const tier = pct > 0.6 ? 'high' : pct > 0.3 ? 'medium' : pct > 0.1 ? 'low' : 'critical';
   fill.setAttribute('data-pct', tier);
 }
+
+/* =====================================================================
+   TOURNAMENT ENGINE
+   ===================================================================== */
+const TournamentEngine = {
+  buildBracket(names) {
+    let n = names.slice(0, 16);
+    const sizes = [4,8,16];
+    let size = sizes.find(s => s >= n.length) || 16;
+    while (n.length < size) n.push('__bye__' + n.length);
+    const seed = n.reduce((h,name)=>NameHasher.hash(h+name), 0);
+    const rng  = NameHasher.seededRNG(seed);
+    n = n.sort(() => rng()-0.5);
+    const rounds = [];
+    let current = n;
+    while (current.length > 1) {
+      const pairs = [];
+      for (let i = 0; i < current.length; i += 2)
+        pairs.push({ p1: current[i], p2: current[i+1], winner: null, result: null });
+      rounds.push(pairs);
+      current = pairs.map(p => p.winner || null);
+    }
+    return rounds;
+  },
+
+  runAll(rounds) {
+    for (let r = 0; r < rounds.length; r++) {
+      const nextRound = rounds[r+1];
+      for (let m = 0; m < rounds[r].length; m++) {
+        const match = rounds[r][m];
+        if (!match.p1 || match.p1.startsWith('__bye__')) {
+          match.winner = match.p2; match.result = null;
+        } else if (!match.p2 || match.p2.startsWith('__bye__')) {
+          match.winner = match.p1; match.result = null;
+        } else {
+          const c1 = new Character(match.p1);
+          const c2 = new Character(match.p2);
+          const eng = new CombatEngine(c1, c2);
+          match.result = eng.fight();
+          match.winner = match.result.winner.name;
+          match.char1  = c1;
+          match.char2  = c2;
+        }
+        if (nextRound) {
+          const slot = Math.floor(m / 2);
+          if (m % 2 === 0) nextRound[slot].p1 = match.winner;
+          else             nextRound[slot].p2 = match.winner;
+        }
+      }
+    }
+    return rounds;
+  },
+
+  champion(rounds) {
+    return rounds[rounds.length - 1][0].winner;
+  }
+};
+
+/* =====================================================================
+   BOSS RUSH CONTROLLER
+   ===================================================================== */
+const BossRush = {
+  playerChar: null,
+  currentBoss: 0,
+  playerName: '',
+  results: [],
+
+  start(playerName) {
+    this.playerName  = playerName;
+    this.currentBoss = 0;
+    this.results     = [];
+    this.playerChar  = new Character(playerName);
+  },
+
+  get currentBossData() { return BOSSES[this.currentBoss]; },
+  get isLastBoss()       { return this.currentBoss === BOSSES.length - 1; },
+
+  restorePartialHP() {
+    const restore = Math.floor((this.playerChar.maxHP - this.playerChar.currentHP) * 0.4);
+    this.playerChar.currentHP = Math.min(this.playerChar.maxHP, this.playerChar.currentHP + restore);
+    return restore;
+  },
+
+  runNextFight() {
+    const boss = createBossCharacter(this.currentBossData);
+    this.playerChar.conditions = new Map();
+    this.playerChar.saveBonus  = 0;
+    this.playerChar._sneakUsed = false;
+    this.playerChar._dodgeUsed = false;
+    this.playerChar._colossusUsed = false;
+    this.playerChar._shieldUsed   = false;
+    this.playerChar._shieldActive = false;
+    this.playerChar._bbUsed = false;
+    this.playerChar._hordeUsed = false;
+    for (const sk of this.playerChar.skills) {
+      sk._usesLeft = sk.uses === Infinity ? Infinity : sk.uses;
+    }
+    if (this.playerChar.classKey==='paladin')  this.playerChar._smiteUses=4;
+    if (this.playerChar.classKey==='wizard')   { this.playerChar._shieldCharges=2; }
+    if (this.playerChar.classKey==='monk')     this.playerChar._ki=5;
+    if (this.playerChar.classKey==='bard')     this.playerChar._cwCharges=(this.playerChar._cwCharges_base||3);
+    if (this.playerChar.classKey==='sorcerer') { this.playerChar._twinReady=true; this.playerChar._twinUsed=false; }
+
+    const engine = new CombatEngine(this.playerChar, boss);
+    const result = engine.fight();
+    const survived = result.winner.name === this.playerChar.name;
+    this.results.push({ boss: this.currentBossData, bossChar: boss, result, survived });
+    if (survived && !this.isLastBoss) {
+      const restored = this.restorePartialHP();
+      result._restoredHP = restored;
+    }
+    return { result, bossChar: boss, survived };
+  },
+
+  advance() { this.currentBoss++; }
+};
 
 /* =====================================================================
    THEME & MODE SYSTEM
@@ -3239,6 +3808,128 @@ function showToast(msg, duration=2000) {
 }
 
 /* =====================================================================
+   AUDIO MANAGER — all sounds via Web Audio API (no external files)
+   ===================================================================== */
+const AudioManager = {
+  ctx: null,
+  enabled: localStorage.getItem('arena_audio') !== 'off',
+
+  _getCtx() {
+    if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+    return this.ctx;
+  },
+
+  _play(fn) {
+    if (!this.enabled) return;
+    try { fn(this._getCtx()); } catch(e) {}
+  },
+
+  hit() {
+    this._play(ctx => {
+      const buf = ctx.createBuffer(1, ctx.sampleRate*0.08, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+      const src = ctx.createBufferSource(); src.buffer=buf;
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.35, ctx.currentTime);
+      src.connect(g); g.connect(ctx.destination); src.start();
+    });
+  },
+
+  miss() {
+    this._play(ctx => {
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.type='sine'; o.frequency.setValueAtTime(300,ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(150,ctx.currentTime+0.15);
+      g.gain.setValueAtTime(0.12,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.15);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime+0.15);
+    });
+  },
+
+  crit() {
+    this._play(ctx => {
+      const buf = ctx.createBuffer(1, ctx.sampleRate*0.05, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
+      const src = ctx.createBufferSource(); src.buffer=buf;
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.6,ctx.currentTime);
+      src.connect(g); g.connect(ctx.destination); src.start();
+      const o = ctx.createOscillator(); const g2 = ctx.createGain();
+      o.type='triangle'; o.frequency.setValueAtTime(880,ctx.currentTime+0.05);
+      o.frequency.exponentialRampToValueAtTime(440,ctx.currentTime+0.4);
+      g2.gain.setValueAtTime(0.2,ctx.currentTime+0.05);
+      g2.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4);
+      o.connect(g2); g2.connect(ctx.destination);
+      o.start(ctx.currentTime+0.05); o.stop(ctx.currentTime+0.4);
+    });
+  },
+
+  heal() {
+    this._play(ctx => {
+      [523.25, 659.25, 783.99].forEach((freq, i) => {
+        const o = ctx.createOscillator(); const g = ctx.createGain();
+        o.type='sine'; o.frequency.value=freq;
+        const t = ctx.currentTime + i*0.08;
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(0.18,t+0.03);
+        g.gain.exponentialRampToValueAtTime(0.001,t+0.5);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(t); o.stop(t+0.5);
+      });
+    });
+  },
+
+  spell() {
+    this._play(ctx => {
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.type='sawtooth';
+      o.frequency.setValueAtTime(200,ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(800,ctx.currentTime+0.25);
+      g.gain.setValueAtTime(0.15,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime+0.3);
+    });
+  },
+
+  death() {
+    this._play(ctx => {
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.type='sine';
+      o.frequency.setValueAtTime(120,ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(40,ctx.currentTime+0.6);
+      g.gain.setValueAtTime(0.4,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.7);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime+0.7);
+    });
+  },
+
+  victory() {
+    this._play(ctx => {
+      [[523,0],[659,0.18],[784,0.36],[1047,0.54]].forEach(([freq,delay]) => {
+        const o = ctx.createOscillator(); const g = ctx.createGain();
+        o.type='square'; o.frequency.value=freq;
+        const t = ctx.currentTime+delay;
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(0.15,t+0.04);
+        g.gain.exponentialRampToValueAtTime(0.001,t+0.35);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(t); o.stop(t+0.35);
+      });
+    });
+  },
+
+  toggle() {
+    this.enabled = !this.enabled;
+    localStorage.setItem('arena_audio', this.enabled ? 'on' : 'off');
+    return this.enabled;
+  }
+};
+
+/* =====================================================================
    GAME UI CONTROLLER
    ===================================================================== */
 const GameUI = {
@@ -3262,6 +3953,57 @@ const GameUI = {
     document.getElementById('btn-sheet').addEventListener('click', ()=>this.showView('sheet'));
     document.getElementById('duel-back').addEventListener('click', ()=>this.showView('landing'));
     document.getElementById('sheet-back').addEventListener('click', ()=>this.showView('landing'));
+
+    // Tournament navigation
+    document.getElementById('btn-tournament')?.addEventListener('click', ()=>this.showView('tournament'));
+    document.getElementById('tournament-back').addEventListener('click', ()=>{
+      document.getElementById('tournament-setup').style.display='block';
+      document.getElementById('tournament-bracket').style.display='none';
+      this.showView('landing');
+    });
+    document.getElementById('btn-start-tournament').addEventListener('click', ()=>this.startTournament());
+    document.getElementById('btn-tournament-reset').addEventListener('click', ()=>{
+      document.getElementById('tournament-setup').style.display='block';
+      document.getElementById('tournament-bracket').style.display='none';
+    });
+    document.getElementById('modal-close').addEventListener('click', ()=>{
+      document.getElementById('match-modal').classList.remove('open');
+    });
+    document.getElementById('match-modal').addEventListener('click', (e)=>{
+      if(e.target===e.currentTarget) e.currentTarget.classList.remove('open');
+    });
+
+    // Boss Rush navigation
+    document.getElementById('btn-boss')?.addEventListener('click', ()=>{ this.initBossRush(); this.showView('boss'); });
+    document.getElementById('boss-back').addEventListener('click', ()=>{
+      document.getElementById('boss-setup').style.display='block';
+      document.getElementById('boss-arena').style.display='none';
+      this.showView('landing');
+    });
+    document.getElementById('btn-start-boss').addEventListener('click', ()=>this.startBossRush());
+    document.getElementById('boss-player-name').addEventListener('keydown', e=>{ if(e.key==='Enter') this.startBossRush(); });
+    document.getElementById('btn-boss-next').addEventListener('click', ()=>{ BossRush.advance(); this.runBossFight(); });
+    document.getElementById('btn-boss-retry').addEventListener('click', ()=>{
+      document.getElementById('boss-setup').style.display='block';
+      document.getElementById('boss-arena').style.display='none';
+    });
+    document.querySelectorAll('[data-boss-speed]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const sp=parseInt(btn.dataset.bossSpeed);
+        BattleRenderer.speed=sp;
+        if(sp===0) BattleRenderer.skip();
+        document.querySelectorAll('[data-boss-speed]').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // Audio toggle
+    const audioBtn = document.getElementById('audio-toggle');
+    audioBtn.textContent = AudioManager.enabled ? '🔊' : '🔇';
+    audioBtn.addEventListener('click', ()=>{
+      const on = AudioManager.toggle();
+      audioBtn.textContent = on ? '🔊' : '🔇';
+    });
 
     // Language toggle
     document.getElementById('lang-toggle').addEventListener('click', ()=>{
@@ -3320,6 +4062,7 @@ const GameUI = {
     document.getElementById('btn-generate-sheet').addEventListener('click', ()=>this.generateSheet());
     document.getElementById('sheet-name').addEventListener('keydown', e=>{ if(e.key==='Enter') this.generateSheet(); });
     document.getElementById('btn-copy-sheet').addEventListener('click', ()=>this.copySheet());
+    document.getElementById('btn-export-sheet').addEventListener('click', ()=>this.exportSheet());
 
     // URL hash routing
     this.handleHash();
@@ -3472,6 +4215,209 @@ const GameUI = {
     navigator.clipboard.writeText(text).then(()=>{
       showToast(cn ? '角色卡已复制！' : 'Character sheet copied!');
     });
+  },
+
+  initBossRush() {
+    const preview = document.getElementById('boss-list-preview');
+    if (!preview) return;
+    preview.innerHTML = BOSSES.map(b=>
+      `<div class="boss-chip">${b.icon}<span class="boss-chip-name">${currentLang==='zh'?b.name.zh:b.name.en}</span></div>`
+    ).join('');
+  },
+
+  startBossRush() {
+    const name = document.getElementById('boss-player-name').value.trim();
+    if (!name) { showToast(currentLang==='zh'?'请输入名字':'Enter your name'); return; }
+    BossRush.start(name);
+    document.getElementById('boss-setup').style.display = 'none';
+    document.getElementById('boss-arena').style.display = 'block';
+    this.runBossFight();
+  },
+
+  async runBossFight() {
+    const cn = currentLang==='zh';
+    this._updateBossProgress();
+    const { result, bossChar, survived } = BossRush.runNextFight();
+
+    renderStatBlock(BossRush.playerChar, document.getElementById('boss-player-block'));
+    renderStatBlock(bossChar,            document.getElementById('boss-enemy-block'));
+    document.getElementById('boss-hp1-name').textContent = BossRush.playerChar.name;
+    document.getElementById('boss-hp2-name').textContent = bossChar.name;
+    this._updateBossHP(BossRush.playerChar, bossChar);
+
+    document.getElementById('boss-result').classList.remove('visible');
+    document.getElementById('boss-log').innerHTML = '';
+
+    BattleRenderer.speed = 1;
+    await BattleRenderer.play(result.events, BossRush.playerChar, bossChar, {
+      onRound:(r)=>{ document.getElementById('boss-round-label').textContent = cn?`第 ${r} 回合`:`Round ${r}`; },
+      onHP:()=>this._updateBossHP(BossRush.playerChar, bossChar),
+      logEl: document.getElementById('boss-log'),
+    });
+
+    this._updateBossHP(BossRush.playerChar, bossChar);
+    this._showBossResult(result, bossChar, survived);
+  },
+
+  _updateBossHP(player, boss) {
+    _updateBarById('boss-hp1-fill','boss-hp1-text', player);
+    _updateBarById('boss-hp2-fill','boss-hp2-text', boss);
+  },
+
+  _updateBossProgress() {
+    const cn = currentLang==='zh';
+    const el = document.getElementById('boss-progress');
+    el.innerHTML = BOSSES.map((b,i)=>{
+      const state = i < BossRush.currentBoss ? 'done' : i === BossRush.currentBoss ? 'active' : '';
+      return `<div class="boss-progress-step ${state}">${b.icon} ${cn?b.name.zh:b.name.en}</div>`;
+    }).join('');
+  },
+
+  _showBossResult(result, bossChar, survived) {
+    const cn = currentLang==='zh';
+    const banner = document.getElementById('boss-result');
+    const nextBtn = document.getElementById('btn-boss-next');
+    const retryBtn = document.getElementById('btn-boss-retry');
+
+    if (survived) {
+      const restored = result._restoredHP || 0;
+      document.getElementById('boss-result-title').textContent =
+        cn ? `✓ 击败了 ${bossChar.name}！` : `✓ Defeated ${bossChar.name}!`;
+      document.getElementById('boss-result-detail').textContent = BossRush.isLastBoss
+        ? (cn?'🏆 全部Boss已击败！你是传说！':'🏆 All bosses defeated! You are legendary!')
+        : (cn?`HP恢复 +${restored}，准备迎战下一个Boss`:`HP restored +${restored}. Ready for next boss.`);
+      nextBtn.style.display = BossRush.isLastBoss ? 'none' : 'inline-flex';
+      nextBtn.textContent = cn ? '下一个Boss ›' : 'Next Boss ›';
+      retryBtn.textContent = cn ? '重新挑战' : 'Play Again';
+    } else {
+      document.getElementById('boss-result-title').textContent =
+        cn ? `✗ 被 ${bossChar.name} 击败！` : `✗ Defeated by ${bossChar.name}!`;
+      document.getElementById('boss-result-detail').textContent =
+        cn ? `止步于第 ${BossRush.currentBoss+1} 关` : `Fell at Boss ${BossRush.currentBoss+1}`;
+      nextBtn.style.display = 'none';
+      retryBtn.textContent = cn ? '重新挑战' : 'Try Again';
+    }
+    banner.classList.add('visible');
+  },
+
+  startTournament() {
+    const raw = document.getElementById('tournament-names').value.trim();
+    const names = raw.split('\n').map(s=>s.trim()).filter(s=>s&&!s.startsWith('__bye__'));
+    if (names.length < 4) {
+      showToast(currentLang==='zh'?'至少输入4个名字':'Enter at least 4 names'); return;
+    }
+    const rounds = TournamentEngine.buildBracket(names);
+    TournamentEngine.runAll(rounds);
+    document.getElementById('tournament-setup').style.display = 'none';
+    document.getElementById('tournament-bracket').style.display = 'block';
+    this.renderBracket(rounds, TournamentEngine.champion(rounds));
+  },
+
+  renderBracket(rounds, champion) {
+    const cn = currentLang==='zh';
+    const container = document.getElementById('bracket-container');
+    const roundNames_zh = ['首轮','半决赛','决赛'];
+    const roundNames_en = ['Round of '+rounds[0].length*2,'Semifinals','Final'];
+
+    let html = '<div class="bracket-wrapper">';
+    rounds.forEach((round, ri) => {
+      const label = cn?(roundNames_zh[ri]||`第${ri+1}轮`):(roundNames_en[ri]||`Round ${ri+1}`);
+      html += `<div class="bracket-round"><div style="font-family:var(--font-heading);font-size:0.7em;color:var(--text-faint);letter-spacing:0.1em;text-align:center;margin-bottom:8px;">${label}</div>`;
+      round.forEach((match, mi) => {
+        const isBye1 = !match.p1 || match.p1.startsWith('__bye__');
+        const isBye2 = !match.p2 || match.p2.startsWith('__bye__');
+        const hasResult = !!match.result;
+        const w = match.winner;
+        const cls1 = match.char1 ? (cn?match.char1.classDef.name.zh:match.char1.classDef.name.en) : '';
+        const cls2 = match.char2 ? (cn?match.char2.classDef.name.zh:match.char2.classDef.name.en) : '';
+        const dataAttr = hasResult ? `data-match-r="${ri}" data-match-m="${mi}"` : '';
+        html += `<div class="bracket-match ${hasResult?'':'pending'}" ${dataAttr}>
+          <div class="bracket-match-label">${cn?`对阵 ${mi+1}`:`Match ${mi+1}`}</div>
+          <div class="bracket-slot ${w===match.p1&&!isBye1?'winner':hasResult?'loser':''}">
+            <span>${isBye1?'—':match.p1}</span>${cls1?`<span class="slot-class">${cls1}</span>`:''}
+          </div>
+          <div class="bracket-slot ${w===match.p2&&!isBye2?'winner':hasResult?'loser':''}">
+            <span>${isBye2?'BYE':match.p2}</span>${cls2?`<span class="slot-class">${cls2}</span>`:''}
+          </div>
+        </div>`;
+      });
+      html += '</div>';
+      if (ri < rounds.length - 1) html += '<div class="bracket-connector"></div>';
+    });
+    html += '</div>';
+
+    if (champion && !champion.startsWith('__bye__')) {
+      const champChar = new Character(champion);
+      const ccls = cn?champChar.classDef.name.zh:champChar.classDef.name.en;
+      html += `<div class="tournament-champion">
+        <div class="champion-title">🏆 ${cn?'冠军':'Champion'}: ${champion}</div>
+        <div class="champion-detail">${ccls} · ${champChar.title}</div>
+      </div>`;
+    }
+    container.innerHTML = html;
+    this._tournamentRounds = rounds;
+
+    container.querySelectorAll('.bracket-match[data-match-r]').forEach(el => {
+      el.addEventListener('click', ()=>{
+        const r = parseInt(el.dataset.matchR), m = parseInt(el.dataset.matchM);
+        this.showMatchDetail(rounds[r][m]);
+      });
+    });
+  },
+
+  showMatchDetail(match) {
+    if (!match.result) return;
+    const cn = currentLang==='zh';
+    document.getElementById('modal-match-title').textContent =
+      `${match.p1} ${cn?'对战':'vs'} ${match.p2}`;
+    const sb = document.getElementById('modal-stat-blocks');
+    sb.innerHTML = '<div id="modal-sb1" class="stat-block"></div><div id="modal-sb2" class="stat-block"></div>';
+    renderStatBlock(match.char1, document.getElementById('modal-sb1'));
+    renderStatBlock(match.char2, document.getElementById('modal-sb2'));
+    const logEl = document.getElementById('modal-combat-log');
+    logEl.innerHTML = '';
+    match.result.events.forEach(ev => {
+      if (ev.type === 'round_start') {
+        const h = document.createElement('div');
+        h.className = 'log-round-header';
+        h.textContent = cn?`第 ${ev.data.round} 回合`:`Round ${ev.data.round}`;
+        logEl.appendChild(h);
+      } else {
+        const line = BattleRenderer._buildLine(ev, match.char1, match.char2);
+        if (line) {
+          const el = document.createElement('div');
+          el.className = 'log-entry';
+          el.style.cssText = 'opacity:1;transform:none;animation:none;';
+          el.innerHTML = line;
+          logEl.appendChild(el);
+        }
+      }
+    });
+    const w = match.result.winner, l = match.result.loser;
+    const wcls = cn?w.classDef.name.zh:w.classDef.name.en;
+    document.getElementById('modal-result').textContent =
+      cn?`${w.name}（${wcls}）胜，共 ${match.result.rounds} 回合`
+        :`${w.name} (${wcls}) wins in ${match.result.rounds} rounds`;
+    document.getElementById('match-modal').classList.add('open');
+  },
+
+  async exportSheet() {
+    const card = document.getElementById('sheet-card');
+    if (!card) { showToast(currentLang==='zh'?'请先生成角色卡':'Generate a sheet first'); return; }
+    if (typeof html2canvas === 'undefined') {
+      showToast(currentLang==='zh'?'截图功能需要网络连接':'Screenshot requires internet'); return;
+    }
+    showToast(currentLang==='zh'?'生成截图中…':'Generating screenshot…', 1500);
+    try {
+      const canvas = await html2canvas(card, { backgroundColor: null, scale: 2, useCORS: true, logging: false });
+      const link = document.createElement('a');
+      link.download = (this._lastSheetChar?.name || 'character') + '_sheet.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast(currentLang==='zh'?'图片已下载！':'Image downloaded!');
+    } catch(e) {
+      showToast(currentLang==='zh'?'截图失败，请手动截图':'Screenshot failed');
+    }
   },
 
   handleHash() {
