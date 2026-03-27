@@ -860,6 +860,7 @@ body.battle-active #result-banner { margin-left: 162px; margin-right: 162px; }
 .melee-fighter-info { font-size: 0.68em; color: var(--text-faint); margin: 1px 0 3px; }
 .melee-hp-track { height: 5px; background: var(--bg-surface); border-radius: 3px; overflow: hidden; }
 .melee-hp-fill { height: 100%; background: var(--green,#27ae60); border-radius: 3px; transition: width 0.5s ease; }
+.melee-hp-text { font-size: 0.68rem; text-align: right; color: var(--text-muted); margin-top: 2px; font-variant-numeric: tabular-nums; }
 .melee-kill-order {
   margin-top: 10px;
   font-family: var(--font-body);
@@ -4911,6 +4912,7 @@ const GameUI = {
         <div class="melee-hp-track">
           <div class="melee-hp-fill" id="melee-hp-${CSS.escape(f.name)}" style="width:100%"></div>
         </div>
+        <div class="melee-hp-text" id="melee-hp-text-${CSS.escape(f.name)}">${f.currentHP} / ${f.maxHP} HP</div>
       </div>`;
     }).join('');
   },
@@ -4931,6 +4933,12 @@ const GameUI = {
         fill.style.background = `linear-gradient(90deg, ${hpColor} ${splitPct}, #b8860b ${splitPct})`;
       } else {
         fill.style.background = hp/max > 0.6 ? '#27ae60' : hp/max > 0.3 ? '#c8a017' : '#c0391c';
+      }
+      const textEl = document.getElementById('melee-hp-text-' + CSS.escape(f.name));
+      if (textEl) {
+        textEl.textContent = tmp > 0
+          ? `${hp}+${tmp} / ${max} HP`
+          : `${hp} / ${max} HP`;
       }
       if (!f.isAlive && row) row.classList.add('eliminated');
     }
