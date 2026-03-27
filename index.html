@@ -549,7 +549,42 @@ body {
   color: var(--accent);
   font-style: italic;
   font-size: 0.82em;
+  margin-bottom: 4px;
+}
+.stat-block-subclass { margin-bottom: 6px; }
+.subclass-badge {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: var(--btn-text);
+  background: var(--heading);
+  padding: 1px 8px;
+  border-radius: 3px;
+}
+.subclass-flavor {
+  font-family: var(--font-body);
+  font-size: 0.78em;
+  color: var(--text-faint);
+  font-style: italic;
+}
+.sheet-subclass-line {
+  font-family: var(--font-body);
+  font-size: 0.88em;
+  color: var(--text-sec);
   margin-bottom: 8px;
+}
+.sheet-subclass-line .sub-badge {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-size: 0.85em;
+  font-weight: 700;
+  color: var(--btn-text);
+  background: var(--heading);
+  padding: 1px 10px;
+  border-radius: 3px;
+  margin-right: 6px;
 }
 .stat-divider {
   border: none;
@@ -1920,6 +1955,372 @@ const CLASSES = {
 };
 
 /* =====================================================================
+   SUBCLASSES — 3 per class, assigned by name hash
+   Each entry: name, flavor badge, and one extra skill object
+   ===================================================================== */
+const SUBCLASSES = {
+  fighter: [
+    { key:'champion',
+      name:{zh:'勇士',en:'Champion'}, flavor:{zh:'暴击强化',en:'Improved Crit'},
+      skill:{ id:'improved_crit', name:{zh:'强化暴击',en:'Improved Critical'},
+        desc:{zh:'投出19或20均视为暴击',en:'Crit on 19–20 (not just 20)'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self._critThreshold = 19; } }
+    },
+    { key:'battlemaster',
+      name:{zh:'战争大师',en:'Battle Master'}, flavor:{zh:'战技骰',en:'Maneuver Die'},
+      skill:{ id:'maneuver', name:{zh:'战技：制造开口',en:'Maneuver: Menacing Attack'},
+        desc:{zh:'命中时额外1d8伤害+目标下回合攻击劣势',en:'On hit: +1d8 dmg, target has disadv next turn'},
+        trigger:'passive', uses:3,
+        onHit(self,target,eng){
+          if(self._maneuverUses>0){ self._maneuverUses--;
+            target.conditions.set('menaced',{rounds:1});
+            return eng.rollD(1,8); } return 0; },
+        onInit(self){ self._maneuverUses=3; } }
+    },
+    { key:'eldritchknight',
+      name:{zh:'魔战士',en:'Eldritch Knight'}, flavor:{zh:'奥法融合',en:'Arcane Fusion'},
+      skill:{ id:'ek_shield', name:{zh:'护盾魔咒',en:'War Magic Shield'},
+        desc:{zh:'每场战斗一次：受攻击时+3 AC（反应）',en:'Once/battle: +3 AC when attacked (reaction)'},
+        trigger:'passive', uses:1,
+        onAttacked(self,eng){
+          if(self._ekShieldUses>0){ self._ekShieldUses--;
+            self.ac+=3; self._ekShieldTemp=true;
+            eng.log({type:'skill',actor:self.name,data:{skill:'War Magic Shield (+3 AC)'}}); } },
+        onInit(self){ self._ekShieldUses=1; } }
+    },
+  ],
+
+  barbarian: [
+    { key:'berserker',
+      name:{zh:'狂战士',en:'Berserker'}, flavor:{zh:'狂暴冲锋',en:'Frenzy'},
+      skill:{ id:'frenzy', name:{zh:'狂暴冲锋',en:'Frenzy'},
+        desc:{zh:'狂暴时奖励动作额外攻击一次',en:'While raging: bonus action extra attack'},
+        trigger:'active', timing:'bonus', uses:3,
+        condition:(c)=>c.self.conditions.has('raging'), priority:60,
+        effect(self,target,eng){
+          const roll=eng.attackRoll(self,target);
+          if(roll.hit){ const d=eng.damageRoll(self,target,roll.crit,'slashing'); eng.applyDamage(target,d,self); }
+          eng.log({type:'attack',actor:self.name,target:target.name,data:{...roll,dmg:roll.hit?eng.rollD(1,self.damageDie):0,skill:'Frenzy'}}); return null; } }
+    },
+    { key:'totem',
+      name:{zh:'图腾战士',en:'Totem Warrior'}, flavor:{zh:'熊图腾',en:'Bear Totem'},
+      skill:{ id:'totem_bear', name:{zh:'熊图腾',en:'Bear Totem'},
+        desc:{zh:'狂暴时对所有伤害类型均有抗性',en:'While raging: resistance to ALL damage types'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self._totemActive=true; } }
+    },
+    { key:'wildmagic',
+      name:{zh:'狂野魔法',en:'Wild Magic'}, flavor:{zh:'魔涌',en:'Magic Surge'},
+      skill:{ id:'wild_surge', name:{zh:'魔法涌现',en:'Wild Magic Surge'},
+        desc:{zh:'每次狂暴时随机触发魔法效果（治疗/伤害/AC）',en:'On rage: random magic effect (heal/damage/AC)'},
+        trigger:'passive', uses:Infinity,
+        onCondition(self,key,eng){
+          if(key==='raging'){
+            const roll=eng.rollD(1,4);
+            if(roll===1){ const h=eng.rollD(1,8)+4; self.currentHP=Math.min(self.maxHP,self.currentHP+h);
+              eng.log({type:'heal',actor:self.name,data:{amount:h,skill:'Wild Surge: Healing'}}); }
+            else if(roll===2){ self.ac+=2;
+              eng.log({type:'skill',actor:self.name,data:{skill:'Wild Surge: +2 AC'}}); }
+          }} }
+    },
+  ],
+
+  rogue: [
+    { key:'assassin',
+      name:{zh:'刺客',en:'Assassin'}, flavor:{zh:'首发必杀',en:'Assassinate'},
+      skill:{ id:'assassinate', name:{zh:'刺杀',en:'Assassinate'},
+        desc:{zh:'第1回合攻击自动暴击',en:'Round 1 attacks are automatic crits'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self._assassinRound=true; } }
+    },
+    { key:'arcane_trickster',
+      name:{zh:'奥法骗徒',en:'Arcane Trickster'}, flavor:{zh:'魔法诡计',en:'Mage Hand'},
+      skill:{ id:'booming_blade', name:{zh:'轰鸣剑击',en:'Booming Blade'},
+        desc:{zh:'每回合首次攻击附带1d8雷鸣伤害',en:'First attack each turn deals +1d8 thunder'},
+        trigger:'passive', uses:Infinity,
+        onHit(self,target,eng){
+          if(!self._bbUsed){ self._bbUsed=true; return eng.rollD(1,8); } return 0; } }
+    },
+    { key:'thief',
+      name:{zh:'窃贼',en:'Thief'}, flavor:{zh:'快手',en:'Fast Hands'},
+      skill:{ id:'fast_hands', name:{zh:'快手',en:'Fast Hands'},
+        desc:{zh:'每回合可使用两次偷袭（不限制一次）',en:'Sneak Attack can trigger twice per turn'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self._sneakLimit=2; } }
+    },
+  ],
+
+  paladin: [
+    { key:'devotion',
+      name:{zh:'虔诚',en:'Oath of Devotion'}, flavor:{zh:'神圣武器',en:'Sacred Weapon'},
+      skill:{ id:'sacred_weapon', name:{zh:'神圣武器',en:'Sacred Weapon'},
+        desc:{zh:'攻击加值额外加CHA修正',en:'+CHA mod to attack rolls'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self.attackBonus += self.chaMod; } }
+    },
+    { key:'vengeance',
+      name:{zh:'复仇',en:'Oath of Vengeance'}, flavor:{zh:'复仇誓约',en:'Vow of Enmity'},
+      skill:{ id:'vow_enmity', name:{zh:'复仇誓约',en:'Vow of Enmity'},
+        desc:{zh:'对目标的所有攻击获得优势',en:'Advantage on all attacks against target'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self._vengeanceVow=true; } }
+    },
+    { key:'ancients',
+      name:{zh:'上古誓约',en:'Oath of the Ancients'}, flavor:{zh:'自然之甲',en:'Aura of Warding'},
+      skill:{ id:'aura_warding', name:{zh:'守护光环',en:'Aura of Warding'},
+        desc:{zh:'对法术伤害获得抗性（减半）',en:'Resistance to spell damage (halved)'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self._spellResistance=true; } }
+    },
+  ],
+
+  ranger: [
+    { key:'hunter',
+      name:{zh:'猎人',en:'Hunter'}, flavor:{zh:'群体猎手',en:'Horde Breaker'},
+      skill:{ id:'horde_breaker', name:{zh:'破群斩',en:'Horde Breaker'},
+        desc:{zh:'每回合额外进行一次攻击（无需动作）',en:'Once/turn: free extra attack after hitting'},
+        trigger:'passive', uses:Infinity,
+        onHit(self,target,eng){
+          if(!self._hordeUsed){ self._hordeUsed=true;
+            const r=eng.attackRoll(self,target);
+            if(r.hit){ const d=eng.damageRoll(self,target,r.crit,'piercing');
+              eng.applyDamage(target,d,self);
+              eng.log({type:'attack',actor:self.name,target:target.name,data:{...r,dmg:d,skill:'Horde Breaker'}}); }
+          } return 0; } }
+    },
+    { key:'gloomstalker',
+      name:{zh:'暗影潜行者',en:'Gloom Stalker'}, flavor:{zh:'先手突袭',en:'Dread Ambusher'},
+      skill:{ id:'dread_ambusher', name:{zh:'威慑突袭者',en:'Dread Ambusher'},
+        desc:{zh:'第1回合额外一次攻击+1d8伤害',en:'Round 1: extra attack dealing +1d8 dmg'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self._gloomRound1=true; } }
+    },
+    { key:'beastmaster',
+      name:{zh:'兽主',en:'Beast Master'}, flavor:{zh:'兽伴协击',en:'Beast Companion'},
+      skill:{ id:'beast_attack', name:{zh:'兽伴协击',en:'Beast Companion Attack'},
+        desc:{zh:'每回合命中后，兽伴补刀1d6穿刺',en:'On hit: companion deals +1d6 piercing'},
+        trigger:'passive', uses:Infinity,
+        onHit(self,target,eng){ return eng.rollD(1,6); } }
+    },
+  ],
+
+  monk: [
+    { key:'open_hand',
+      name:{zh:'开手',en:'Open Hand'}, flavor:{zh:'推击/击倒',en:'Open Hand Technique'},
+      skill:{ id:'open_hand_tech', name:{zh:'开手技法',en:'Open Hand Technique'},
+        desc:{zh:'疾风连击命中后：目标力量豁免，失败则击倒（劣势）',en:'After Flurry hit: STR save or knocked prone (disadv)'},
+        trigger:'passive', uses:Infinity,
+        onHit(self,target,eng){
+          if(self.conditions.has('flurrying')){
+            const saved=eng.savingThrow(target,'str',8+self.proficiencyBonus+self.wisMod);
+            if(!saved) target.conditions.set('prone',{rounds:1});
+          } return 0; } }
+    },
+    { key:'shadow',
+      name:{zh:'暗影',en:'Way of Shadow'}, flavor:{zh:'暗影步',en:'Shadow Step'},
+      skill:{ id:'shadow_step', name:{zh:'暗影步',en:'Shadow Step'},
+        desc:{zh:'一次/战斗：传送到目标身边，下次攻击优势',en:'Once/battle: teleport to target, advantage on next attack'},
+        trigger:'active', timing:'bonus', uses:1,
+        condition:(c)=>!c.self._shadowUsed, priority:55,
+        effect(self,target,eng){
+          self._shadowUsed=true; self.conditions.set('shadow_adv',{rounds:1});
+          eng.log({type:'skill',actor:self.name,data:{skill:'Shadow Step'}}); return null; } }
+    },
+    { key:'elements',
+      name:{zh:'四象',en:'Way of the Four Elements'}, flavor:{zh:'元素拳',en:'Elemental Strike'},
+      skill:{ id:'elemental_strike', name:{zh:'元素拳',en:'Elemental Strike'},
+        desc:{zh:'攻击附带1d6元素伤害（消耗气点）',en:'Attacks deal +1d6 elemental damage (costs ki)'},
+        trigger:'passive', uses:Infinity,
+        onHit(self,target,eng){
+          if(self._ki>0){ self._ki--;return eng.rollD(1,6); } return 0; } }
+    },
+  ],
+
+  wizard: [
+    { key:'evocation',
+      name:{zh:'塑能',en:'Evocation'}, flavor:{zh:'赋能咒文',en:'Empowered Evocation'},
+      skill:{ id:'empowered_evoc', name:{zh:'赋能塑能',en:'Empowered Evocation'},
+        desc:{zh:'所有伤害法术额外加INT修正伤害',en:'All damage spells deal +INT mod damage'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self._evocationBonus = self.intMod; } }
+    },
+    { key:'necromancy',
+      name:{zh:'死灵',en:'Necromancy'}, flavor:{zh:'阴冷收割',en:'Grim Harvest'},
+      skill:{ id:'grim_harvest', name:{zh:'阴冷收割',en:'Grim Harvest'},
+        desc:{zh:'每次法术造成伤害时，恢复造成伤害一半的生命（最多5点）',en:'Regain HP = half damage dealt by spells (max 5/hit)'},
+        trigger:'passive', uses:Infinity,
+        onSpellDamage(self,dmg,eng){
+          const h=Math.min(5,Math.floor(dmg/2));
+          if(h>0){ self.currentHP=Math.min(self.maxHP,self.currentHP+h);
+            eng.log({type:'heal',actor:self.name,data:{amount:h,skill:'Grim Harvest'}}); } } }
+    },
+    { key:'abjuration',
+      name:{zh:'防护',en:'Abjuration'}, flavor:{zh:'奥法护盾',en:'Arcane Ward'},
+      skill:{ id:'arcane_ward', name:{zh:'奥法护盾',en:'Arcane Ward'},
+        desc:{zh:'战斗开始获得INT修正×2点临时生命',en:'Start of battle: INT mod×2 temp HP'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self.tempHP=(self.tempHP||0)+Math.max(1,self.intMod*2); } }
+    },
+  ],
+
+  cleric: [
+    { key:'life',
+      name:{zh:'生命',en:'Life Domain'}, flavor:{zh:'生命门徒',en:'Disciple of Life'},
+      skill:{ id:'disciple_life', name:{zh:'生命门徒',en:'Disciple of Life'},
+        desc:{zh:'所有治疗效果额外+3点',en:'All healing effects +3 HP'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self._healBonus=(self._healBonus||0)+3; } }
+    },
+    { key:'war',
+      name:{zh:'战争',en:'War Domain'}, flavor:{zh:'战争祭司',en:'War Priest'},
+      skill:{ id:'war_priest', name:{zh:'战争祭司',en:'War Priest'},
+        desc:{zh:'每场战斗额外进行一次武器攻击（奖励动作）',en:'Once/battle: extra weapon attack as bonus action'},
+        trigger:'active', timing:'bonus', uses:1,
+        condition:(c)=>true, priority:45,
+        effect(self,target,eng){
+          const roll=eng.attackRoll(self,target);
+          if(roll.hit){ const d=eng.damageRoll(self,target,roll.crit,'bludgeoning');
+            eng.applyDamage(target,d,self);
+            eng.log({type:'attack',actor:self.name,target:target.name,data:{...roll,dmg:d,skill:'War Priest'}}); }
+          else eng.log({type:'attack',actor:self.name,target:target.name,data:{...roll,skill:'War Priest'}});
+          return null; } }
+    },
+    { key:'light',
+      name:{zh:'光明',en:'Light Domain'}, flavor:{zh:'光明屏障',en:'Warding Flare'},
+      skill:{ id:'warding_flare', name:{zh:'光明屏障',en:'Warding Flare'},
+        desc:{zh:'被攻击时（反应）：施加攻击劣势（每场3次）',en:'Reaction: impose disadv on attacker (3/battle)'},
+        trigger:'passive', uses:3,
+        onAttacked(self,eng){
+          if(self._wardingFlare>0){ self._wardingFlare--;
+            eng.log({type:'skill',actor:self.name,data:{skill:'Warding Flare (disadv on attacker)'}});
+            return true; } return false; },
+        onInit(self){ self._wardingFlare=3; } }
+    },
+  ],
+
+  sorcerer: [
+    { key:'wild_magic',
+      name:{zh:'狂野魔法',en:'Wild Magic'}, flavor:{zh:'魔涌潮涌',en:'Wild Surge'},
+      skill:{ id:'surge_on_cast', name:{zh:'施法魔涌',en:'Tides of Chaos'},
+        desc:{zh:'每次施法后25%概率随机额外效果（+伤/+治/+AC）',en:'25% chance: random bonus after each spell cast'},
+        trigger:'passive', uses:Infinity,
+        onSpellDamage(self,dmg,eng){
+          if(eng.rng()<0.25){
+            const r=eng.rollD(1,3);
+            if(r===1){ self.currentHP=Math.min(self.maxHP,self.currentHP+5);
+              eng.log({type:'heal',actor:self.name,data:{amount:5,skill:'Wild Surge: Healing'}}); }
+            else if(r===2){ eng.log({type:'skill',actor:self.name,data:{skill:'Wild Surge: +'+eng.rollD(1,6)+' bonus dmg'}}); }
+          }} }
+    },
+    { key:'draconic',
+      name:{zh:'龙裔',en:'Draconic Bloodline'}, flavor:{zh:'龙鳞护体',en:'Draconic Resilience'},
+      skill:{ id:'draconic_resilience', name:{zh:'龙裔韧性',en:'Draconic Resilience'},
+        desc:{zh:'AC+1，HP上限+5',en:'AC +1, max HP +5'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self.ac+=1; self.maxHP+=5; self.currentHP+=5; } }
+    },
+    { key:'storm',
+      name:{zh:'风暴',en:'Storm Sorcery'}, flavor:{zh:'风暴愤怒',en:"Storm's Fury"},
+      skill:{ id:'storms_fury', name:{zh:'风暴愤怒',en:"Storm's Fury"},
+        desc:{zh:'被近战攻击命中后，反击2d6闪电伤害',en:'When hit by melee: retaliate 2d6 lightning'},
+        trigger:'passive', uses:Infinity,
+        onDamaged(self,dmg,attacker,eng){
+          if(attacker&&eng){
+            const ret=eng.rollD(2,6);
+            eng.applyDamage(attacker,ret,self);
+            eng.log({type:'skill',actor:self.name,target:attacker.name,data:{skill:"Storm's Fury",dmg:ret,dmgType:'lightning'}});
+          } return dmg; } }
+    },
+  ],
+
+  warlock: [
+    { key:'fiend',
+      name:{zh:'恶魔',en:'The Fiend'}, flavor:{zh:'黑暗祝福',en:"Dark One's Blessing"},
+      skill:{ id:'dark_blessing', name:{zh:'黑暗祝福',en:"Dark One's Blessing"},
+        desc:{zh:'击杀敌人时恢复CHA修正+5临时HP',en:'On kill: gain CHA mod+5 temp HP'},
+        trigger:'passive', uses:Infinity,
+        onKill(self,eng){
+          const h=self.chaMod+5;
+          self.tempHP=(self.tempHP||0)+h;
+          eng.log({type:'skill',actor:self.name,data:{skill:"Dark One's Blessing (+"+h+" temp HP)"}}); } }
+    },
+    { key:'archfey',
+      name:{zh:'妖精领主',en:'The Archfey'}, flavor:{zh:'妖精之影',en:'Fey Presence'},
+      skill:{ id:'fey_presence', name:{zh:'妖精之影',en:'Fey Presence'},
+        desc:{zh:'一次/战斗：感知豁免，失败则目标下回合无法攻击',en:'Once/battle: WIS save or target cannot attack next turn'},
+        trigger:'active', timing:'action', uses:1,
+        condition:(c)=>true, priority:85,
+        effect(self,target,eng){
+          const saved=eng.savingThrow(target,'wis',self.spellSaveDC);
+          if(!saved) target.conditions.set('frightened',{rounds:1});
+          eng.log({type:'spell',actor:self.name,target:target.name,data:{spell:'Fey Presence',saved}});
+          return null; } }
+    },
+    { key:'great_old_one',
+      name:{zh:'太古之主',en:'Great Old One'}, flavor:{zh:'心灵冲击',en:'Psychic Blast'},
+      skill:{ id:'psychic_blast', name:{zh:'心灵冲击',en:'Psychic Blast'},
+        desc:{zh:'2次/战斗：额外1d8精神伤害（命中时触发）',en:'2/battle: +1d8 psychic on hit'},
+        trigger:'passive', uses:2,
+        onHit(self,target,eng){
+          if(self._gooUses>0){ self._gooUses--; return eng.rollD(1,8); } return 0; },
+        onInit(self){ self._gooUses=2; } }
+    },
+  ],
+
+  bard: [
+    { key:'lore',
+      name:{zh:'传说',en:'College of Lore'}, flavor:{zh:'额外嘲讽',en:'Bonus Cutting Words'},
+      skill:{ id:'lore_extra_cw', name:{zh:'博学嘲讽',en:'Extra Cutting Words'},
+        desc:{zh:'讥讽之词每场战斗可用次数+2',en:'Cutting Words: +2 extra uses/battle'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self._cwCharges=(self._cwCharges||3)+2; } }
+    },
+    { key:'valor',
+      name:{zh:'英勇',en:'College of Valor'}, flavor:{zh:'战斗激励',en:'Combat Inspiration'},
+      skill:{ id:'combat_inspiration', name:{zh:'战斗激励',en:'Combat Inspiration'},
+        desc:{zh:'每回合攻击加1d6（鼓舞骰）',en:'+1d6 to attack rolls each turn (inspiration die)'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self._valorBonus=true; } }
+    },
+    { key:'glamour',
+      name:{zh:'魅惑',en:'College of Glamour'}, flavor:{zh:'魅力光环',en:'Mantle of Inspiration'},
+      skill:{ id:'mantle_inspiration', name:{zh:'灵感光环',en:'Mantle of Inspiration'},
+        desc:{zh:'战斗开始：获得CHA修正×2临时HP',en:'Battle start: gain CHA mod×2 temp HP'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ self.tempHP=(self.tempHP||0)+Math.max(1,self.chaMod*2); } }
+    },
+  ],
+
+  druid: [
+    { key:'moon',
+      name:{zh:'月亮',en:'Circle of the Moon'}, flavor:{zh:'灰熊变身',en:'Dire Bear'},
+      skill:{ id:'dire_bear', name:{zh:'灰熊变身',en:'Dire Bear Wild Shape'},
+        desc:{zh:'变身形态升级为灰熊：临时HP+15',en:'Wild Shape upgrades to Dire Bear: +15 temp HP'},
+        trigger:'passive', uses:Infinity,
+        onInit(self){ /* Handled in wild_shape effect by checking subclassKey */ } }
+    },
+    { key:'land',
+      name:{zh:'土地',en:'Circle of the Land'}, flavor:{zh:'自然恢复',en:'Natural Recovery'},
+      skill:{ id:'natural_recovery', name:{zh:'自然恢复',en:'Natural Recovery'},
+        desc:{zh:'每场战斗回复一次法术位（恢复1d8+4 HP）',en:'Once/battle: regain spell slot (restore 1d8+4 HP)'},
+        trigger:'active', timing:'bonus', uses:1,
+        condition:(c)=>c.self.currentHP<c.self.maxHP*0.7, priority:50,
+        effect(self,target,eng){
+          const h=eng.rollD(1,8)+4; self.currentHP=Math.min(self.maxHP,self.currentHP+h);
+          eng.log({type:'heal',actor:self.name,data:{amount:h,skill:'Natural Recovery'}}); return null; } }
+    },
+    { key:'spores',
+      name:{zh:'孢子',en:'Circle of Spores'}, flavor:{zh:'共生实体',en:'Symbiotic Entity'},
+      skill:{ id:'symbiotic', name:{zh:'共生实体',en:'Symbiotic Entity'},
+        desc:{zh:'攻击附带1d6毒素伤害',en:'Attacks deal +1d6 poison damage'},
+        trigger:'passive', uses:Infinity,
+        onHit(self,target,eng){ return eng.rollD(1,6); } }
+    },
+  ],
+};
+
+/* =====================================================================
    CHARACTER — builds a full D&D character from a name
    ===================================================================== */
 class Character {
@@ -1981,6 +2382,19 @@ class Character {
       ? `"${adjList[ti]}${nounList[tn]}"`
       : `"The ${adjList[ti]} ${nounList[tn]}"`;
 
+    // 7b. Assign subclass (next rng value after title)
+    const subList = SUBCLASSES[this.classKey];
+    const subIdx  = Math.floor(rng() * subList.length);
+    const sub     = subList[subIdx];
+    this.subclassKey    = sub.key;
+    this.subclassName   = sub.name;
+    this.subclassFlavor = sub.flavor;
+    // Deep copy and inject subclass skill
+    const subSkill = Object.assign({}, sub.skill, {
+      _usesLeft: sub.skill.uses === Infinity ? Infinity : sub.skill.uses
+    });
+    this.skills.push(subSkill);
+
     // 7. Combat state (reset before each fight)
     this.resetCombat();
 
@@ -2015,6 +2429,8 @@ class Character {
     this._dodgeUsed    = false;
     this._colossusUsed = false;
     this._shieldUsed   = false;
+    this._bbUsed       = false;   // Booming Blade resets each turn
+    this._hordeUsed    = false;   // Horde Breaker resets each turn
     if (this._shieldActive) { this.ac -= 5; this._shieldActive = false; }
     // Tick down conditions
     for (const [k,v] of this.conditions) {
@@ -2096,7 +2512,8 @@ class CombatEngine {
 
   // Resolve a full attack roll
   attackRoll(attacker, defender) {
-    const hasAdv  = attacker.conditions.has('raging') || attacker.classKey==='barbarian';
+    const hasAdv  = attacker.conditions.has('raging') || attacker.classKey==='barbarian'
+                 || attacker._vengeanceVow || attacker.conditions.has('shadow_adv');
     const hasDisadv = defender.conditions.has('dodging');
     const advantage    = hasAdv && !hasDisadv;
     const disadvantage = hasDisadv && !hasAdv;
@@ -2104,13 +2521,15 @@ class CombatEngine {
 
     const rawRoll = this.rollD20(advantage && !isMocked, disadvantage || isMocked);
     const total   = rawRoll + attacker.attackBonus;
-    const crit    = rawRoll === 20;
+    const critThreshold = attacker._critThreshold || 20;
+    const crit    = rawRoll >= critThreshold;
+    const actualCrit = crit || (attacker._assassinRound && this.round === 1);
     const fumble  = rawRoll === 1;
     const targetAC = defender.ac;
-    const hit  = !fumble && (crit || total >= targetAC);
 
+    const preHit = !fumble && (actualCrit || total >= targetAC);
     // Shield reaction
-    if (!hit && !fumble) {
+    if (!preHit && !fumble) {
       const shSk = defender.skills.find(s=>s.id==='shield_spell');
       if (shSk && shSk.onAttacked && shSk._usesLeft > 0) {
         shSk.onAttacked(defender, this);
@@ -2125,7 +2544,7 @@ class CombatEngine {
       if (cwMod < 0) cwSk._usesLeft--;
     }
 
-    return { roll:rawRoll, total:total+cwMod, crit, fumble, hit: !fumble && (crit || (total+cwMod)>=targetAC), advantage, disadvantage };
+    return { roll:rawRoll, total:total+cwMod, crit:actualCrit, fumble, hit: !fumble && (actualCrit || (total+cwMod)>=targetAC), advantage, disadvantage };
   }
 
   // Spell attack roll (uses spellAttack bonus = proficiency + casting stat)
@@ -2213,6 +2632,10 @@ class CombatEngine {
       const ag = target.conditions.get('agathys');
       // (reflection logged separately in renderer)
     }
+    // Totem Bear: resistance to all damage types while raging
+    if (target.conditions.has('raging') && target._totemActive) amount = Math.floor(amount / 2);
+    // Aura of Warding: spell resistance (source is a caster)
+    if (target._spellResistance && source && source.classDef && source.classDef.isCaster) amount = Math.floor(amount / 2);
     // Temp HP absorbs first
     if (target.tempHP > 0) {
       const absorbed = Math.min(target.tempHP, amount);
@@ -2242,6 +2665,22 @@ class CombatEngine {
 
   // Standard attack sequence (1 or 2 attacks)
   doAttacks(attacker, defender) {
+    // Gloom Stalker: bonus attack on round 1 with +1d8
+    if (attacker._gloomRound1 && this.round === 1) {
+      attacker._gloomRound1 = false;
+      if (defender.isAlive) {
+        const gr = this.attackRoll(attacker, defender);
+        if (gr.hit) {
+          const gd = this.damageRoll(attacker, defender, gr.crit, 'piercing') + this.rollD(1,8);
+          this.log({type:'attack',actor:attacker.name,target:defender.name,
+            data:{roll:gr.roll,total:gr.total,ac:defender.ac,hit:true,crit:gr.crit,dmg:gd,dmgType:'piercing',skill:'Dread Ambusher'}});
+          this.applyDamage(defender, gd, attacker);
+        } else {
+          this.log({type:'attack',actor:attacker.name,target:defender.name,
+            data:{roll:gr.roll,total:gr.total,ac:defender.ac,hit:false,skill:'Dread Ambusher'}});
+        }
+      }
+    }
     const attacks = 1 + (attacker.classDef.extraAttacks||0) + (this.extraAttackThisTurn ? 1 : 0);
     this.extraAttackThisTurn = false;
     let totalDmg = 0;
@@ -2415,6 +2854,7 @@ function renderStatBlock(char, el) {
     <div class="stat-block-name">${char.name}</div>
     <div class="stat-block-class">${cls} · Lv.${char.level} · ${char.classDef.icon}</div>
     <div class="stat-block-title">${char.title}</div>
+    <div class="stat-block-subclass"><span class="subclass-badge">${cn?(char.subclassName.zh||char.subclassName.en):char.subclassName.en}</span> <span class="subclass-flavor">${cn?(char.subclassFlavor.zh||char.subclassFlavor.en||''):char.subclassFlavor.en||''}</span></div>
     <hr class="stat-divider">
     <div class="ability-scores">
       ${['STR','DEX','CON','INT','WIS','CHA'].map((ab,i)=>{
@@ -2460,6 +2900,7 @@ function renderFullSheet(char, container) {
     <div class="char-sheet-card" id="sheet-card">
       <div class="sheet-name">${char.name}</div>
       <div class="sheet-class-line">${cls} · ${cn?'等级':'Level'} ${char.level} · ${char.classDef.icon}</div>
+      <div class="sheet-subclass-line"><span class="sub-badge">${cn?(char.subclassName.zh||char.subclassName.en):char.subclassName.en}</span>${cn?(char.subclassFlavor.zh||''):char.subclassFlavor.en||''}</div>
       <div class="sheet-title-line">${char.title}</div>
       <hr class="sheet-divider">
       <div class="sheet-core-stats">
