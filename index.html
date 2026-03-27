@@ -1505,12 +1505,102 @@ body.battle-active #result-banner { margin-left: 162px; margin-right: 162px; }
 /* ===================================================================
    RESPONSIVE
    =================================================================== */
+
+/* ── Tablet (≤768px) ── */
+@media (max-width: 768px) {
+  #main { max-width: 100%; padding: 20px 16px 40px; }
+
+  /* Sidebar cards narrower on tablet */
+  body.battle-active #stat-block-1,
+  body.battle-active #stat-block-2 { width: 130px; }
+  body.battle-active #hp-bars,
+  body.battle-active #combat-section,
+  body.battle-active #result-banner { margin-left: 138px; margin-right: 138px; }
+}
+
+/* ── Mobile (≤600px) ── */
+@media (max-width: 600px) {
+  /* Topbar */
+  #topbar { padding: 0 12px; height: 46px; }
+  #topbar-title { font-size: 0.88em; letter-spacing: 0.06em; }
+  .topbar-btn { padding: 4px 9px; font-size: 0.68em; }
+
+  /* Main */
+  #main { padding: 14px 10px 36px; }
+
+  /* Settings panel — prevent overflow off right edge */
+  #settings-panel { width: min(280px, calc(100vw - 16px)); right: 8px; border-radius: var(--radius-lg); }
+
+  /* ── Battle-active sidebar: revert fixed → inline strip ── */
+  body.battle-active #char-grid {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: 0;
+  }
+  body.battle-active #stat-block-1,
+  body.battle-active #stat-block-2 {
+    position: static;
+    transform: none !important;
+    width: 50%;
+    max-height: none;
+    overflow-y: visible;
+    padding: 8px;
+    animation: none !important;
+    border-radius: var(--radius);
+    border-left: revert;
+    border-right: revert;
+    border-top: 3px solid var(--border-stat);
+  }
+  /* Show title in mobile inline cards */
+  body.battle-active .stat-block .stat-block-title { display: block; font-size: 0.68em; }
+  /* Remove margin offsets — no longer needed */
+  body.battle-active #hp-bars,
+  body.battle-active #combat-section,
+  body.battle-active #result-banner { margin-left: 0; margin-right: 0; }
+
+  /* Duel inputs */
+  .name-input { width: 130px; padding: 8px 10px; }
+  .duel-input-area { gap: 8px; }
+  .vs-orb { width: 36px; height: 36px; font-size: 0.75em; }
+
+  /* Stat block grid already 1-col via max-width:600px above; ensure spacing */
+  .char-grid { gap: 10px; }
+
+  /* Combat controls */
+  .combat-controls { gap: 6px; }
+  .speed-btn { padding: 3px 8px; }
+
+  /* Grand Melee HP grid — allow narrower cards */
+  .melee-hp-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px; }
+
+  /* Mode cards */
+  .mode-grid { gap: 10px; }
+  .mode-card { padding: 18px 12px; }
+  .mode-card-icon { font-size: 1.8em; }
+
+  /* Boss Rush HP bars */
+  .boss-hp-section { flex-wrap: wrap; gap: 8px; }
+
+  /* Tournament bracket always scrollable on mobile */
+  .bracket-wrapper { gap: 14px; }
+
+  /* Character sheet */
+  .char-sheet-card { padding: 16px 12px; }
+  .sheet-ability-grid { gap: 4px; }
+}
+
+/* ── Small mobile (≤480px) ── */
 @media (max-width: 480px) {
-  #main { padding: 20px 14px 40px; }
   .ability-scores { gap: 1px; }
   .ability-box .ab-val { font-size: 1em; }
-  .char-sheet-card { padding: 18px 14px; }
-  .sheet-ability-grid { gap: 4px; }
+  /* Stack duel input vertically on very small screens */
+  .duel-input-area { flex-direction: column; align-items: center; }
+  .vs-orb { display: none; }
+  .name-input { width: 100%; max-width: 260px; }
+  /* Melee grid: 1 column on tiny screens */
+  .melee-hp-grid { grid-template-columns: 1fr 1fr; }
 }
 </style>
 </head>
