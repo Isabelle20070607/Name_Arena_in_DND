@@ -3563,6 +3563,7 @@ function renderFullSheet(char, container) {
       <div class="sheet-class-line">${cls} · ${cn?'等级':'Level'} ${char.level} · ${char.classDef.icon}</div>
       <div class="sheet-subclass-line"><span class="sub-badge">${cn?(char.subclassName.zh||char.subclassName.en):char.subclassName.en}</span>${cn?(char.subclassFlavor.zh||''):char.subclassFlavor.en||''}</div>
       <div class="sheet-title-line">${char.title}</div>
+      ${char.alignmentShort ? `<div class="stat-block-alignment" style="margin:4px 0 0;"><span class="alignment-badge alignment-${char.alignmentShort}">${char.alignmentShort}</span> <span class="alignment-label">${cn?char.alignmentZh:char.alignment}</span></div>` : ''}
       <hr class="sheet-divider">
       <div class="sheet-core-stats">
         <span class="sheet-core-stat"><b>HP</b> ${char.maxHP}</span>
