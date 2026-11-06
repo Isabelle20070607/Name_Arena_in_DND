@@ -9,6 +9,14 @@
 
 Convert any name into a full D&D 5e character and watch them fight. Same name, same character. Same matchup, same battle.
 
+## AI DM 单人冒险原型 · Solo Adventure Prototype
+
+在保留原五种模式的基础上，新增独立的本机冒险入口：角色生成、AI DM 多回合互动、服务端检定与自动遭遇、SQLite 存档恢复和持续记忆。原 `index.html` 保持原样。
+
+需要 **Node.js 24+**，无 npm 依赖。先用 `npm run demo` 体验离线流程，再按 **[冒险原型运行说明](adventure/README.md)** 配置服务端 API 密钥并运行 `npm start`。浏览器打开 `http://127.0.0.1:3000/adventure/`；原竞技场在 `/arena/`，也仍可直接打开 HTML 文件。
+
+这是个人本机原型，尚未部署；真实 OpenAI 请求需用户在本机配置后验证。**[验证记录与待测项目](adventure/VALIDATION.md)** 明确区分静态检查、实际运行测试与尚未完成的验证。
+
 ---
 
 ## 游戏模式 · Modes

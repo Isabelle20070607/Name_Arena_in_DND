@@ -1,0 +1,14 @@
+{
+  "name": "name-arena-ai-dm",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Local solo adventure prototype reusing Name Arena's character and combat engine",
+  "engines": { "node": ">=24.0.0" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env adventure/server.cjs",
+    "demo": "node --env-file-if-exists=.env adventure/server.cjs --demo",
+    "test": "node --test adventure/test/*.test.cjs",
+    "engine:extract": "node scripts/extract-arena.cjs",
+    "engine:check": "node scripts/extract-arena.cjs --check"
+  }
+}
