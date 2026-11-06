@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>名字竞技场 · 单人冒险</title>
+  <link rel="stylesheet" href="/adventure/style.css">
+  <script src="/adventure/app.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <div><p class="eyebrow">NAME ARENA · SOLO ADVENTURE</p><h1>一个名字，一段冒险。</h1></div>
+    <div class="header-tools"><span id="mode" class="badge">正在连接</span><a href="/arena/" target="_blank" rel="noopener">打开名字竞技场 ↗</a></div>
+  </header>
+  <main class="layout">
+    <aside class="sidebar">
+      <section class="panel">
+        <h2>冒险存档</h2>
+        <label for="saved">继续一段旅程</label>
+        <div class="load-row"><select id="saved"><option value="">选择战役…</option></select><button type="button" id="load">载入</button></div>
+        <details id="new-campaign" open>
+          <summary>创建新的冒险</summary>
+          <form id="create-form">
+            <label for="name">角色名字</label><input id="name" name="name" maxlength="80" required autocomplete="off" placeholder="与原竞技场同名会生成同一角色">
+            <label for="background">背景熟练</label><select id="background" name="background">
+              <option value="wanderer">旅人 · 察觉 / 求生</option><option value="scholar">学者 · 奥秘 / 调查</option><option value="diplomat">使者 · 洞悉 / 游说</option>
+            </select>
+            <label for="title">战役名称 <span class="optional">可选</span></label><input id="title" name="title" maxlength="80" placeholder="给这段旅程起个名字">
+            <label for="premise">开场设定 <span class="optional">可选</span></label><textarea id="premise" name="premise" maxlength="1200" rows="3" placeholder="不填写则从旧桥与神秘钟声开始"></textarea>
+            <button type="submit" class="primary">创建角色并开始</button>
+          </form>
+        </details>
+      </section>
+      <section id="character-panel" class="panel" hidden>
+        <p class="eyebrow">YOUR CHARACTER</p><h2 id="character-name"></h2><p id="character-class"></p>
+        <div class="vitals"><strong id="hp"></strong><span id="ac"></span></div>
+        <dl id="stats" class="stats"></dl><p id="background-info" class="muted"></p>
+        <details><summary>技能资源</summary><ul id="resources"></ul></details>
+        <h3>随身物品</h3><ul id="inventory"></ul>
+      </section>
+    </aside>
+    <section class="adventure panel">
+      <div class="campaign-heading"><div><p class="eyebrow">THE JOURNAL</p><h2 id="campaign-title">你的旅程将从这里开始</h2><p id="scene" class="muted">创建角色，或载入已有战役。</p></div><a id="export" hidden>导出记录 ↓</a></div>
+      <p id="status" class="status" role="status" aria-live="polite">正在读取本机服务…</p>
+      <p id="error" class="error" role="alert" hidden></p>
+      <div id="empty" class="empty"><span class="compass" aria-hidden="true">✦</span><p>雨停之后，路还很长。</p><p class="muted">你决定行动，DM 描述世界。需要检定时，骰子由规则引擎掷出。</p></div>
+      <button id="older" type="button" hidden>读取更早的记录</button>
+      <div id="transcript" aria-label="冒险记录"></div>
+      <div id="pending-box" class="notice" hidden><p id="pending-description"></p><div class="button-row"><button id="retry" type="button" class="primary">重试续写</button><button id="cancel" type="button">取消未完成回合</button></div></div>
+      <button id="start" type="button" class="primary" hidden>生成开场</button>
+      <form id="action-form" hidden>
+        <label for="action">你接下来做什么？</label>
+        <textarea id="action" name="action" maxlength="2000" rows="3" required placeholder="例如：我仔细检查石碑上被雨水冲淡的字迹。"></textarea>
+        <div class="action-footer"><span class="muted">每个完成回合自动保存</span><button type="submit" class="primary" id="send">采取行动 →</button></div>
+      </form>
+      <details id="memory" hidden><summary>旅程记忆</summary><p id="goal"></p><p id="summary" class="prose"></p></details>
+      <p class="footnote">采用原竞技场的简化 5e 机制 · 五级角色 · 战斗自动结算</p>
+    </section>
+  </main>
+</body>
+</html>
